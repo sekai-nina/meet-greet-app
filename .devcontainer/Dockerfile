@@ -19,6 +19,16 @@ RUN ARCH=$(uname -m) && \
 # Supabase CLI
 RUN curl -fsSL https://raw.githubusercontent.com/supabase/cli/main/install.sh | sh
 
+# Gitleaks (機密情報スキャン)
+RUN ARCH=$(uname -m) && \
+    case "$ARCH" in \
+      aarch64|arm64) GL_ARCH="arm64" ;; \
+      x86_64)        GL_ARCH="x64" ;; \
+      *)             echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+    esac && \
+    curl -fsSL "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_8.30.1_linux_${GL_ARCH}.tar.gz" \
+    | tar -xz -C /usr/local/bin/ gitleaks
+
 # EAS CLI
 RUN npm install -g eas-cli
 

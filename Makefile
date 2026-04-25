@@ -4,13 +4,14 @@
 # セットアップ
 # ============================================================
 
-## 初回セットアップ (依存パッケージ + 環境変数復号 + DB)
+## 初回セットアップ (依存パッケージ + Git hooks + 環境変数確認)
 setup:
 	@if [ -f package.json ]; then \
 		npm install; \
 	else \
 		echo "⚠ package.json not found. Skipping npm install (design phase)."; \
 	fi
+	@bash scripts/setup-hooks.sh
 	@if [ -f .env ]; then \
 		echo "✓ .env found"; \
 	else \
