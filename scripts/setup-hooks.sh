@@ -13,7 +13,8 @@ cat > "$HOOKS_DIR/pre-commit" << 'HOOK'
 # Gitleaks pre-commit hook: コミット前に機密情報をスキャン
 
 if command -v mise &>/dev/null; then
-  GITLEAKS_CMD="mise exec -- gitleaks"
+  # グローバル設定の Python 等を無視し、プロジェクトのツールだけを対象にする
+  GITLEAKS_CMD="env MISE_GLOBAL_CONFIG_FILE=/dev/null MISE_DEFAULT_TOOL_VERSIONS_FILENAME=/dev/null mise exec -- gitleaks"
 elif command -v gitleaks &>/dev/null; then
   GITLEAKS_CMD="gitleaks"
 else
