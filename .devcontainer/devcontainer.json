@@ -1,0 +1,42 @@
+{
+  "name": "Meet & Greet App",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "forwardPorts": [8081, 19000, 19001, 19002, 54321, 54323],
+  "portsAttributes": {
+    "8081": { "label": "Metro Bundler" },
+    "19000": { "label": "Expo Dev Server" },
+    "19001": { "label": "Expo Dev Server (alt)" },
+    "19002": { "label": "Expo DevTools" },
+    "54321": { "label": "Supabase API" },
+    "54323": { "label": "Supabase Studio" }
+  },
+
+  "remoteEnv": {
+    "REACT_NATIVE_PACKAGER_HOSTNAME": "${localEnv:REACT_NATIVE_PACKAGER_HOSTNAME}"
+  },
+
+  "postCreateCommand": "make setup",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+      }
+    }
+  }
+}
