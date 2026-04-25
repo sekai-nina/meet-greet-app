@@ -169,6 +169,11 @@
 - `.gitignore` に以下を必ず含める:
   - `.env.keys` (万が一ローカルに生成された場合の安全策)
   - `.env` (平文の環境変数)
+- **機密情報の漏洩防止は 2 層で対策する**:
+  - **ローカル (pre-commit)**: Gitleaks でコミット前に機密情報パターンをスキャン・ブロック
+  - **リモート (GitHub Push Protection)**: push 時に既知のシークレットパターンを検出・ブロック (public リポジトリではデフォルト有効)
+- 誤検知は `.gitleaksignore` に fingerprint を追加して除外する
+- 新規開発者は `make setup` で自動的に pre-commit フックが設定される
 
 ### 3.6 インフラ・運用
 

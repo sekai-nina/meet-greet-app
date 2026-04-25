@@ -1,21 +1,45 @@
 .PHONY: setup dev lint typecheck test check db-start db-reset db-migrate eas-update clean
 
+# mise exec 経由でコマンドを実行し、mise activate なしでも pinned ツールを使えるようにする
+MISE := mise exec --
+
 # ============================================================
 # セットアップ
 # ============================================================
 
-## 初回セットアップ (依存パッケージ + 環境変数復号 + DB)
+## 初回セットアップ (mise ツール確認 + dotenvx-rs + npm install + Git hooks)
 setup:
-	@if [ -f package.json ]; then \
-		npm install; \
-	else \
-		echo "⚠ package.json not found. Skipping npm install (design phase)."; \
-	fi
+	@command -v mise >/dev/null || (echo "❌ mise がインストールされていません。https://mise.run を参照してください" && exit 1)
+	@echo "→ mise install (Node.js, gitleaks, supabase, eas-cli, codex)..."
+	@mise install
+	@echo "→ dotenvx-rs の確認..."
+	@export PATH="$$HOME/.local/bin:$$PATH" && \
+	command -v dotenvx >/dev/null || ( \
+		echo "→ dotenvx-rs をインストール中..." && \
+		mkdir -p $$HOME/.local/bin && \
+		OS=$$(uname -s | tr '[:upper:]' '[:lower:]') && \
+		ARCH=$$(uname -m) && \
+		case "$${OS}-$${ARCH}" in \
+			darwin-arm64)   TARGET="aarch64-apple-darwin" ;; \
+			darwin-x86_64)  TARGET="x86_64-apple-darwin" ;; \
+			linux-aarch64)  TARGET="aarch64-unknown-linux-gnu" ;; \
+			linux-x86_64)   TARGET="x86_64-unknown-linux-gnu" ;; \
+			*)              echo "❌ Unsupported platform: $${OS}-$${ARCH}" && exit 1 ;; \
+		esac && \
+		curl -fsSL "https://github.com/linux-china/dotenvx-rs/releases/latest/download/dotenvx-$${TARGET}.tar.gz" \
+		| tar -xz -C $$HOME/.local/bin/ && \
+		echo "✓ dotenvx-rs をインストールしました ($$HOME/.local/bin/dotenvx)" \
+	)
+	@echo "→ npm install..."
+	@$(MISE) npm install
+	@echo "→ Git hooks の設定..."
+	@bash scripts/setup-hooks.sh
 	@if [ -f .env ]; then \
 		echo "✓ .env found"; \
 	else \
 		echo "⚠ .env not found. Run 'dotenvx init' or get the private key from a team member."; \
 	fi
+	@echo "✓ セットアップ完了"
 
 # ============================================================
 # 開発
@@ -23,19 +47,19 @@ setup:
 
 ## 開発サーバー起動
 dev:
-	dotenvx run -- npx expo start
+	$(MISE) dotenvx run -- npx expo start
 
 ## ESLint 実行
 lint:
-	npx expo lint
+	$(MISE) npx expo lint
 
 ## TypeScript 型チェック
 typecheck:
-	npx tsc --noEmit
+	$(MISE) npx tsc --noEmit
 
 ## テスト実行
 test:
-	npx jest --forceExit
+	$(MISE) npx jest --forceExit
 
 ## lint + typecheck + test を一括実行
 check: lint typecheck test
@@ -46,15 +70,15 @@ check: lint typecheck test
 
 ## ローカル Supabase を起動
 db-start:
-	supabase start
+	$(MISE) supabase start
 
 ## ローカル DB をリセット & マイグレーション再適用
 db-reset:
-	supabase db reset
+	$(MISE) supabase db reset
 
 ## 新しいマイグレーションファイルを作成 (usage: make db-migrate NAME=add_events)
 db-migrate:
-	supabase migration new $(NAME)
+	$(MISE) supabase migration new $(NAME)
 
 # ============================================================
 # EAS
@@ -62,7 +86,7 @@ db-migrate:
 
 ## EAS Update (OTA) を preview チャンネルに公開
 eas-update:
-	eas update --channel preview --non-interactive
+	$(MISE) eas update --channel preview --non-interactive
 
 # ============================================================
 # クリーンアップ

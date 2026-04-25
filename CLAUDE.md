@@ -32,7 +32,6 @@ stores/                 # Zustand ストア
 types/                  # TypeScript 型定義
 supabase/migrations/    # テーブル定義・RLS ポリシー
 docs/                   # ドメイン知識・要件定義
-.devcontainer/          # devcontainer 設定 (Dockerfile, docker-compose)
 .claude/                # Claude Code 設定 (rules / agents / skills)
 ```
 
