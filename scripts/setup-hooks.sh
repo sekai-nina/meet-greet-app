@@ -4,19 +4,27 @@
 
 set -euo pipefail
 
-HOOKS_DIR="$(git rev-parse --show-toplevel)/.git/hooks"
+HOOKS_DIR="$(git rev-parse --git-path hooks)"
+mkdir -p "$HOOKS_DIR"
 
 # pre-commit: Gitleaks による機密情報スキャン
 cat > "$HOOKS_DIR/pre-commit" << 'HOOK'
 #!/bin/bash
 # Gitleaks pre-commit hook: コミット前に機密情報をスキャン
 
-if ! command -v gitleaks &>/dev/null; then
-  echo "⚠ gitleaks がインストールされていません。brew install gitleaks で導入してください。"
-  exit 0
+if command -v mise &>/dev/null; then
+  GITLEAKS_CMD="mise exec -- gitleaks"
+elif command -v gitleaks &>/dev/null; then
+  GITLEAKS_CMD="gitleaks"
+else
+  echo "❌ gitleaks を実行できないため、コミットを中止します。"
+  echo "   mise を使用して gitleaks を導入してください:"
+  echo "     mise install gitleaks"
+  echo "   シェルに mise activate を設定していない場合は mise exec 経由で実行されます。"
+  exit 1
 fi
 
-gitleaks protect --staged --verbose
+$GITLEAKS_CMD protect --staged --verbose
 if [ $? -ne 0 ]; then
   echo ""
   echo "❌ 機密情報が検出されました。コミットを中止します。"
