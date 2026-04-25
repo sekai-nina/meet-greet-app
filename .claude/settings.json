@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Agent(architecture-reviewer)",
+      "Agent(code-quality-reviewer)",
+      "Agent(db-migration-reviewer)",
+      "Agent(twada)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/plan-review.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
