@@ -1,6 +1,10 @@
 .PHONY: setup dev lint typecheck test check db-start db-reset db-migrate eas-update clean
 
 # mise exec 経由でコマンドを実行し、mise activate なしでも pinned ツールを使えるようにする
+# グローバル設定 (~/.tool-versions, ~/.config/mise/config.toml) を無視し、
+# プロジェクトの .mise.toml のツールだけを対象にする
+export MISE_GLOBAL_CONFIG_FILE := /dev/null
+export MISE_DEFAULT_TOOL_VERSIONS_FILENAME := /dev/null
 MISE := mise exec --
 
 # ============================================================
@@ -11,7 +15,7 @@ MISE := mise exec --
 setup:
 	@command -v mise >/dev/null || (echo "❌ mise がインストールされていません。https://mise.run を参照してください" && exit 1)
 	@echo "→ mise install (Node.js, gitleaks, supabase, eas-cli, codex)..."
-	@mise install
+	@mise install node gitleaks supabase npm:eas-cli npm:@openai/codex
 	@echo "→ dotenvx-rs の確認..."
 	@export PATH="$$HOME/.local/bin:$$PATH" && \
 	command -v dotenvx >/dev/null || ( \
