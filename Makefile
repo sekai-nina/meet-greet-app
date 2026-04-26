@@ -100,10 +100,12 @@ catalog-share:
 				echo ""; \
 				echo "========================================"; \
 				echo "  共有 URL: $$url/catalog"; \
-				echo "  (クリップボードにコピーしました)"; \
 				echo "========================================"; \
 				echo ""; \
-				echo "$$url/catalog" | pbcopy; \
+				if command -v pbcopy >/dev/null 2>&1; then \
+					echo "$$url/catalog" | pbcopy; \
+					echo "  (クリップボードにコピーしました)"; \
+				fi; \
 			fi; \
 		done \
 	'
