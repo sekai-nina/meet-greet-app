@@ -1,4 +1,4 @@
-.PHONY: setup dev lint typecheck test check db-start db-reset db-migrate eas-update clean
+.PHONY: setup dev lint typecheck test check db-start db-reset db-migrate eas-update storybook storybook-web storybook-build clean
 
 # mise exec 経由でコマンドを実行し、mise activate なしでも pinned ツールを使えるようにする
 # グローバル設定 (~/.tool-versions, ~/.config/mise/config.toml) を無視し、
@@ -67,6 +67,22 @@ test:
 
 ## lint + typecheck + test を一括実行
 check: lint typecheck test
+
+# ============================================================
+# Storybook
+# ============================================================
+
+## On-device Storybook 起動
+storybook:
+	EXPO_PUBLIC_STORYBOOK_ENABLED=true $(MISE) dotenvx run -- npx expo start
+
+## Web Storybook 起動 (ブラウザで確認・共有用)
+storybook-web:
+	$(MISE) npx storybook dev -p 6006
+
+## Web Storybook 静的ビルド (デプロイ用)
+storybook-build:
+	$(MISE) npx storybook build
 
 # ============================================================
 # Supabase
