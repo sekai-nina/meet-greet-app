@@ -200,8 +200,11 @@
 
 ```
 releases  (シングル or アルバム)
-  id, title, number, release_date, center_member,
+  id, title, number, release_date,
   release_type (single|album)
+
+release_centers  (リリースのセンター、ダブルセンター対応)
+  release_id, member_id, center_order
 
 events  (1リリースに複数紐づく場合あり)
   id, release_id, format (online|offline)
@@ -210,7 +213,10 @@ members
   id, name, generation, birthday
 
 event_days
-  id, event_id, day_number, date, slot_count
+  id, event_id, day_number, date
+
+event_slots  (部 / 時間帯スロット)
+  id, event_day_id, slot_number, starts_at, ends_at
 
 event_day_members  (出演メンバー)
   event_day_id, member_id
