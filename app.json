@@ -11,7 +11,10 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.sekai-nina.meet-greet",
-      "appleTeamId": "HQ2AUFJXP5"
+      "appleTeamId": "HQ2AUFJXP5",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
