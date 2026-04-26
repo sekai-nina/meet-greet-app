@@ -8,6 +8,17 @@
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/guard-dangerous-commands.sh"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "ExitPlanMode",
