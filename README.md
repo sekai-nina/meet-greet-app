@@ -128,7 +128,7 @@ GitHub Issues に分解          1 Issue = 1 ブランチで完結する粒度
 ### Phase 2: 実装 (Issue → ブランチ → PR)
 
 ```
-/create-branch               Issue からブランチ��成 + branch-plan.md 生成
+/create-branch               Issue からブランチ作成 + branch-plan.md 生成
         ↓
 branch-plan.md に従って作業   設計 → ドキュメント → 実装 → レビュー
         ↓

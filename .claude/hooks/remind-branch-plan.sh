@@ -3,7 +3,8 @@
 # 毎回ではなく 5 回に 1 回だけ発火し、ノイズを抑える
 
 PLAN_FILE="${CLAUDE_PROJECT_DIR:-.}/.claude/branch-plan.md"
-COUNTER_FILE="/tmp/branch-plan-remind-counter"
+PROJECT_HASH=$(echo "${CLAUDE_PROJECT_DIR:-.}" | md5sum 2>/dev/null | cut -d' ' -f1 || echo "default")
+COUNTER_FILE="/tmp/branch-plan-remind-counter-${PROJECT_HASH}"
 
 # branch-plan.md が存在しなければ何もしない
 if [ ! -f "$PLAN_FILE" ]; then

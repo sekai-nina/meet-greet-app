@@ -166,8 +166,8 @@ git commit -m "fixup! :bubbles: Makefile を mise ベースに更新"
 # 2. PR のベースブランチとの分岐点を特定
 BASE=$(git merge-base main HEAD)
 
-# 3. autosquash で fixup! コミットを自動的に元コミットに統合
-git rebase --autosquash $BASE
+# 3. autosquash で fixup! コミットを自動的に元コミットに統合 (非対話モード)
+GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash $BASE
 
 # 4. force push (PR ブランチのみ。main には絶対にしない)
 git push --force-with-lease

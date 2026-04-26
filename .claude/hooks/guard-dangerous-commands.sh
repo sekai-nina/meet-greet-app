@@ -6,6 +6,18 @@
 set -eo pipefail
 
 INPUT=$(cat)
+
+# jq が無い場合は fail-closed (安全側に倒してブロック)
+if ! command -v jq &>/dev/null; then
+  cat <<WARN
+{
+  "decision": "block",
+  "reason": "jq が見つかりません。危険コマンドガードが機能しないためブロックします。mise install で jq をインストールしてください。"
+}
+WARN
+  exit 0
+fi
+
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null || echo "")
 
 if [ -z "$COMMAND" ]; then
@@ -23,7 +35,7 @@ COMMAND_STRIPPED=$(echo "$COMMAND" | sed \
 
 # 危険なコマンドパターン (大文字小文字区別なし)
 if echo "$COMMAND_STRIPPED" | grep -qiE \
-  "rm -rf /|rm -rf \.|git push --force[^-]|git push -f |git reset --hard|git checkout \.\$|git clean -fd|DROP TABLE|DROP DATABASE|TRUNCATE|git branch -D main|git branch -D master"; then
+  "rm -rf /|rm -rf \.|git push --force|git push -f[ \t]|git push -f$|git reset --hard|git checkout \.$|git clean -f|DROP TABLE|DROP DATABASE|TRUNCATE|git branch -D main|git branch -D master"; then
   cat <<WARN
 {
   "decision": "block",

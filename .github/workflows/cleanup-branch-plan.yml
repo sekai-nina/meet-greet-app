@@ -13,6 +13,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Remove branch-plan.md if exists
         run: |
           if [ -f .claude/branch-plan.md ]; then
