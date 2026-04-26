@@ -37,6 +37,12 @@ const TEXT_SIZE_CLASSES: Record<ButtonSize, string> = {
   lg: 'text-lg',
 };
 
+const INDICATOR_COLOR: Record<ButtonVariant, string> = {
+  primary: '#ffffff',
+  secondary: '#ffffff',
+  outline: '#2563eb',
+};
+
 export const Button: FC<ButtonProps> = ({
   label,
   variant = 'primary',
@@ -58,7 +64,7 @@ export const Button: FC<ButtonProps> = ({
       {isLoading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'outline' ? '#2563eb' : '#ffffff'}
+          color={INDICATOR_COLOR[variant]}
         />
       ) : (
         <Text
