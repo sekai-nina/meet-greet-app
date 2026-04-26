@@ -1,8 +1,11 @@
 import { Redirect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const IS_STORYBOOK_ENABLED =
+  __DEV__ && process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true';
+
 export default function StorybookScreen() {
-  if (!__DEV__) {
+  if (!IS_STORYBOOK_ENABLED) {
     return <Redirect href="/" />;
   }
 

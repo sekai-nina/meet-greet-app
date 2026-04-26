@@ -83,14 +83,19 @@ catalog:
 ## カタログを Cloudflare Tunnel で外部共有 (Ctrl+C で終了)
 catalog-share:
 	@bash -c '\
-		trap "kill $$EXPO_PID 2>/dev/null; exit" INT TERM EXIT; \
 		$(MISE) dotenvx run -- npx expo start --web --port 8081 & \
 		EXPO_PID=$$!; \
+		trap "kill $$EXPO_PID 2>/dev/null; exit" INT TERM EXIT; \
 		echo "→ Expo Web 起動待機中..."; \
+		EXPO_READY=false; \
 		for i in $$(seq 1 30); do \
-			if curl -s http://localhost:8081 >/dev/null 2>&1; then break; fi; \
+			if curl -s http://localhost:8081 >/dev/null 2>&1; then EXPO_READY=true; break; fi; \
 			sleep 1; \
 		done; \
+		if [ "$$EXPO_READY" = false ]; then \
+			echo "❌ Expo Web の起動に失敗しました (30 秒タイムアウト)"; \
+			exit 1; \
+		fi; \
 		echo "→ Cloudflare Tunnel を起動中..."; \
 		$(MISE) cloudflared tunnel --url http://localhost:8081 2>&1 \
 		| while IFS= read -r line; do \
