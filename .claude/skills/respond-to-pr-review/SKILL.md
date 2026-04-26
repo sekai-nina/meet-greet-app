@@ -132,6 +132,32 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/comments \
 # may: — 対応する場合は修正+返信、しない場合は返信不要
 ```
 
+### 5.5. conversation の resolve
+
+返信が完了したスレッドは GraphQL API で resolve する。
+**返信しただけでは conversation は resolve されない。必ずこのステップを実行すること。**
+
+```bash
+# 未 resolve のスレッド ID を取得
+gh api graphql -f query='{
+  repository(owner: "{owner}", name: "{repo}") {
+    pullRequest(number: {pr_number}) {
+      reviewThreads(first: 50) {
+        nodes {
+          id
+          isResolved
+        }
+      }
+    }
+  }
+}' --jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .id] | .[]' | while read -r THREAD_ID; do
+  gh api graphql -f query="mutation { resolveReviewThread(input: {threadId: \"$THREAD_ID\"}) { thread { isResolved } } }"
+done
+```
+
+- 対応済み (must/should で修正、question に回答) のスレッドをすべて resolve する
+- may で対応しないスレッドも resolve してよい (マージをブロックしないため)
+
 ### 6. 再レビューの確認
 
 修正を push した後:
