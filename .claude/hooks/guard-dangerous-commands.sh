@@ -12,9 +12,14 @@ if [ -z "$COMMAND" ]; then
   exit 0
 fi
 
-# git commit -m のメッセージ部分を除去してからチェックする
-# (コミットメッセージ内に危険なキーワードが含まれる場合の誤検知を防ぐ)
-COMMAND_STRIPPED=$(echo "$COMMAND" | sed "s/git commit -m .*//g")
+# コマンドの引数部分 (コミットメッセージや PR body) に含まれるキーワードの誤検知を防ぐ
+# heredoc 内容 (<<EOF...EOF, <<'EOF'...EOF) と -m/--body 引数を除去する
+COMMAND_STRIPPED=$(echo "$COMMAND" | sed \
+  -e "/<<['\"]\\{0,1\\}EOF/,/^EOF/d" \
+  -e "/<<['\"]\\{0,1\\}WARN/,/^WARN/d" \
+  -e "s/git commit -m .*//g" \
+  -e "s/--body .*//g" \
+  -e "s/--body=.*//g")
 
 # 危険なコマンドパターン (大文字小文字区別なし)
 if echo "$COMMAND_STRIPPED" | grep -qiE \
