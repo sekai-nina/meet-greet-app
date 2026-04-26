@@ -36,7 +36,7 @@ PR タイトル:
 PR 本文テンプレート:
 
 ```bash
-gh pr create --title "PRタイトル" --body "$(cat <<'EOF'
+gh pr create --title "PRタイトル" --reviewer @copilot --body "$(cat <<'EOF'
 ## 概要
 (変更の目的を1-3行で記述)
 
@@ -54,7 +54,19 @@ EOF
 )"
 ```
 
-### 5. PR URL の共有
+### 5. Copilot レビューを待つ
+
+PR 作成後、GitHub Copilot が自動的にレビューを行う (通常 1-3 分)。
+
+```bash
+# 60 秒待ってからレビューコメントを確認
+sleep 60
+gh api repos/{owner}/{repo}/pulls/{pr_number}/comments --paginate
+```
+
+Copilot のレビューコメントがついたら `/respond-to-pr-review` スキルで対応する。
+
+### 6. PR URL の共有
 
 作成した PR の URL をユーザーに共有する。
 
@@ -63,3 +75,4 @@ EOF
 - `main` ブランチから直接 PR を作成しない
 - PR 作成前に必ずレビューを実施する
 - Critical な指摘が残っている状態で PR を作成しない
+- PR 作成時は必ず `--reviewer @copilot` を指定する

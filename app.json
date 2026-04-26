@@ -10,7 +10,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.meetgreetapp"
+      "bundleIdentifier": "com.sekai-nina.meet-greet",
+      "appleTeamId": "HQ2AUFJXP5"
     },
     "android": {
       "adaptiveIcon": {
