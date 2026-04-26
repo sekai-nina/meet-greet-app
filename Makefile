@@ -1,4 +1,4 @@
-.PHONY: setup dev lint typecheck test check db-start db-reset db-migrate eas-update storybook storybook-web storybook-build clean
+.PHONY: setup dev lint typecheck test check db-start db-reset db-migrate eas-update storybook catalog catalog-share clean
 
 # mise exec 経由でコマンドを実行し、mise activate なしでも pinned ツールを使えるようにする
 # グローバル設定 (~/.tool-versions, ~/.config/mise/config.toml) を無視し、
@@ -76,13 +76,37 @@ check: lint typecheck test
 storybook:
 	EXPO_PUBLIC_STORYBOOK_ENABLED=true $(MISE) dotenvx run -- npx expo start
 
-## Web Storybook 起動 (ブラウザで確認・共有用)
-storybook-web:
-	$(MISE) npx storybook dev -p 6006
+## コンポーネントカタログを Web ブラウザで開く
+catalog:
+	$(MISE) dotenvx run -- npx expo start --web
 
-## Web Storybook 静的ビルド (デプロイ用)
-storybook-build:
-	$(MISE) npx storybook build
+## カタログを Cloudflare Tunnel で外部共有 (Ctrl+C で終了)
+catalog-share:
+	@bash -c '\
+		trap "kill $$EXPO_PID 2>/dev/null; exit" INT TERM EXIT; \
+		$(MISE) dotenvx run -- npx expo start --web --port 8081 & \
+		EXPO_PID=$$!; \
+		echo "→ Expo Web 起動待機中..."; \
+		for i in $$(seq 1 30); do \
+			if curl -s http://localhost:8081 >/dev/null 2>&1; then break; fi; \
+			sleep 1; \
+		done; \
+		echo "→ Cloudflare Tunnel を起動中..."; \
+		$(MISE) cloudflared tunnel --url http://localhost:8081 2>&1 \
+		| while IFS= read -r line; do \
+			echo "$$line"; \
+			url=$$(echo "$$line" | grep -oE "https://[a-z0-9-]+\.trycloudflare\.com"); \
+			if [ -n "$$url" ]; then \
+				echo ""; \
+				echo "========================================"; \
+				echo "  共有 URL: $$url/catalog"; \
+				echo "  (クリップボードにコピーしました)"; \
+				echo "========================================"; \
+				echo ""; \
+				echo "$$url/catalog" | pbcopy; \
+			fi; \
+		done \
+	'
 
 # ============================================================
 # Supabase

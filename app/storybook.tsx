@@ -1,4 +1,5 @@
 import { Redirect } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import StorybookUI from '../.rnstorybook';
 
@@ -7,5 +8,9 @@ export default function StorybookScreen() {
     return <Redirect href="/" />;
   }
 
-  return <StorybookUI />;
+  return (
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom', 'left', 'right']}>
+      <StorybookUI />
+    </SafeAreaView>
+  );
 }

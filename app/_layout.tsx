@@ -7,6 +7,7 @@ export default function RootLayout() {
     <Stack>
       <Stack.Screen name="index" options={{ title: 'ミーグリ記録' }} />
       <Stack.Screen name="storybook" options={{ headerShown: false }} />
+      <Stack.Screen name="catalog" options={{ title: 'コンポーネントカタログ' }} />
     </Stack>
   );
 }
