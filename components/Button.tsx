@@ -56,7 +56,8 @@ export const Button: FC<ButtonProps> = ({
   return (
     <Pressable
       role="button"
-      accessibilityState={{ disabled: isInactive }}
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: isInactive, busy: isLoading }}
       disabled={isInactive}
       onPress={onPress}
       className={`items-center justify-center rounded-lg ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${isInactive ? 'opacity-50' : ''}`}
