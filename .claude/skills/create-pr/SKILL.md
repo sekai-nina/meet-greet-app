@@ -57,10 +57,28 @@ EOF
 ### 5. Copilot レビューを待つ
 
 PR 作成後、GitHub Copilot が自動的にレビューを行う (通常 1-3 分)。
+固定時間の sleep ではなく、ポーリングでレビューの完了を検知する。
 
 ```bash
-# 60 秒待ってからレビューコメントを確認
-sleep 60
+# 最大 5 分間、30 秒ごとに Copilot のレビューを確認
+COPILOT_FOUND=false
+for i in $(seq 1 10); do
+  COPILOT_REVIEWS=$(gh api repos/{owner}/{repo}/pulls/{pr_number}/reviews \
+    --jq '[.[] | select(.user.login == "copilot-pull-request-reviewer[bot]")] | length')
+  if [ "$COPILOT_REVIEWS" -gt 0 ]; then
+    echo "Copilot レビューが投稿されました"
+    COPILOT_FOUND=true
+    break
+  fi
+  echo "レビュー待機中... (${i}/10)"
+  sleep 30
+done
+
+if [ "$COPILOT_FOUND" = false ]; then
+  echo "⚠ タイムアウト: 5 分以内に Copilot レビューが検出されませんでした。手動で確認してください。"
+fi
+
+# レビューコメントを取得
 gh api repos/{owner}/{repo}/pulls/{pr_number}/comments --paginate
 ```
 

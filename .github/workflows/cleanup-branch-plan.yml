@@ -1,0 +1,26 @@
+name: Cleanup branch plan
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.claude/branch-plan.md'
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Remove branch-plan.md if exists
+        run: |
+          if [ -f .claude/branch-plan.md ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git rm .claude/branch-plan.md
+            git commit -m ":balloon: branch-plan.md を削除"
+            git push
+          fi

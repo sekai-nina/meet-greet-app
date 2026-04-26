@@ -106,49 +106,64 @@ docs/                   # ドメイン知識・要件定義
 - **push 時**: GitHub Push Protection がリモートで二重チェック (public リポジトリで自動有効)
 - **環境変数**: dotenvx-rs で暗号化。平文の `.env` / `.env.keys` はコミット禁止 (`.gitignore` で除外済み)
 
-## Claude Code による開発
+## 開発フロー
 
 このプロジェクトは **Claude Code** を使った AI アシスト開発を前提としています。
+開発は **計画フェーズ** と **実装フェーズ** の 2 段階で進めます。
 
-### 設定ファイル
+### Phase 1: 計画 (マイルストーン → Issue)
+
+```
+docs/milestones/M1-xxx.md    マイルストーン定義 (目標・スコープ・DoD)
+        ↓
+曖昧点レビュー                ambiguity-review で質問を潰す
+        ↓
+GitHub Issues に分解          1 Issue = 1 ブランチで完結する粒度
+```
+
+- マイルストーンは `docs/milestones/` で管理する。テンプレート: `docs/milestones/milestone-template.md`
+- Issue は受け入れ条件を明確にしてから着手する。テンプレート: `docs/milestones/issue-template.md`
+- 詳細は [`docs/milestones/README.md`](docs/milestones/README.md) を参照
+
+### Phase 2: 実装 (Issue → ブランチ → PR)
+
+```
+/create-branch               Issue からブランチ作成 + branch-plan.md 生成
+        ↓
+branch-plan.md に従って作業   設計 → ドキュメント → 実装 → レビュー
+        ↓
+/create-pr                   PR 作成 → Copilot レビュー → マージ
+```
+
+ブランチ作成時に `.claude/branch-plan.md` が自動生成され、フローのチェックリストとして機能します。
+Claude Code は作業の区切りごとにこのファイルを読み返し、記載されたスキルを実行します。
+テンプレート: `.claude/templates/branch-plan-template.md`
+
+### Claude Code 設定ファイル
 
 | ファイル | 役割 |
 |----------|------|
 | `CLAUDE.md` | プロジェクト概要・技術スタック・行動原理 |
 | `.claude/rules/` | コーディング規約・命名規則・ユビキタス言語 |
-| `.claude/agents/reviewer/` | レビューエージェント (アーキテクチャ / コード品質 / DB マイグレーション) |
-| `.claude/agents/twada.md` | TDD 遵守監視エージェント |
+| `.claude/templates/` | Branch Plan テンプレート |
+| `.claude/agents/` | レビューエージェント・TDD 監視エージェント |
 | `.claude/skills/` | ワークフロースキル (下表参照) |
-| `.claude/settings.json` | エージェント実行許可 |
+| `.claude/hooks/` | 自動リマインド・設計レビュー |
 
 ### スキル一覧
 
-| スキル | コマンド | 説明 |
-|--------|---------|------|
-| 設計レビュー | `/plan-review` | Plan モードの設計案を Codex CLI でレビュー |
-| 実装前ドキュメント更新 | `/pre-impl-docs` | ユビキタス言語・要件定義を実装前に最新化 |
-| 実装後ドキュメント更新 | `/post-impl-docs` | 実装後にドキュメントとコードの整合性を確認 |
-| Storybook | `/storybook` | コンポーネントのストーリーを作成・更新 |
-| コミット | `/commit` | lint→型チェック→絵文字プレフィックス付きコミット |
-| ブランチ作成 | `/create-branch` | 命名規約に従ったブランチ作成 |
-| PR 作成 | `/create-pr` | レビュー実施→PR 作成 |
-| コードレビュー | `/review` | 4つのレビューエージェントを並列起動 |
-| Worktree 管理 | `/worktree` | git worktree の作成・一覧・切替・削除 |
-
-### 典型的な開発フロー
-
-```
-1. /worktree create feature/xxx     ← worktree を作成
-2. Plan モードで設計                 ← 3ステップ以上のタスク
-3. /plan-review                     ← Codex で設計レビュー
-4. /pre-impl-docs                   ← ドキュメント更新
-5. 実装                             ← コードを書く
-6. /storybook                       ← UI コンポーネントのストーリー追加
-7. /post-impl-docs                  ← ドキュメント整合性チェック
-8. /commit                          ← lint→型チェック→コミット
-9. /review                          ← コードレビュー
-10. /create-pr                      ← PR 作成
-```
+| コマンド | 説明 |
+|---------|------|
+| `/create-branch` | ブランチ作成 + branch-plan.md 生成 |
+| `/plan-review` | Plan モードの設計案を Codex CLI でレビュー |
+| `/pre-impl-docs` | ユビキタス言語・要件定義を実装前に最新化 |
+| `/storybook` | UI コンポーネントのストーリーを作成・更新 |
+| `/commit` | lint → 型チェック → 絵文字プレフィックス付きコミット |
+| `/review` | 4 つのレビューエージェントを並列起動 |
+| `/post-impl-docs` | 実装後にドキュメントとコードの整合性を確認 |
+| `/create-pr` | PR 作成 (Copilot レビュー付き) |
+| `/respond-to-pr-review` | レビューコメントを分類・対応 |
+| `/worktree` | git worktree の管理 |
 
 ## ドキュメント
 
@@ -156,4 +171,5 @@ docs/                   # ドメイン知識・要件定義
 |-------------|------|
 | [`docs/domain.md`](docs/domain.md) | ミーグリのドメイン知識 (構造・用語・購入の仕組み) |
 | [`docs/requirements.md`](docs/requirements.md) | 機能要件・非機能要件・データモデル・画面構成 |
+| [`docs/milestones/`](docs/milestones/) | マイルストーン定義・Issue テンプレート |
 | [`.claude/rules/ubiquitous-language.md`](.claude/rules/ubiquitous-language.md) | ユビキタス言語 (日本語⇔コード上の英語名の対応表) |

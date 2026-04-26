@@ -157,23 +157,24 @@ gh api repos/{owner}/{repo}/pulls/{pr_number}/comments \
 
 レビュー対応で生まれた修正コミットは履歴ノイズになるため、元のコミットに統合してからマージする。
 
+修正コミット作成時に `fixup!` プレフィックスをつけておき、`--autosquash` で自動整理する。
+
 ```bash
-# 1. PR のベースブランチとの分岐点を特定
+# 1. 修正コミット時に fixup! プレフィックスをつける
+git commit -m "fixup! :bubbles: Makefile を mise ベースに更新"
+
+# 2. PR のベースブランチとの分岐点を特定
 BASE=$(git merge-base main HEAD)
 
-# 2. 対話的 rebase で fixup (autosquash で fixup! コミットを自動整理)
-git rebase -i $BASE
-
-# 3. rebase 中に修正コミットを対応する元コミットの直後に移動し、pick → fixup に変更
-# 例:
-#   pick abc1234 :bubbles: Makefile を mise ベースに更新
-#   fixup def5678 :fish: Makefile の dotenvx-rs インストールを cross-platform 対応
+# 3. autosquash で fixup! コミットを自動的に元コミットに統合 (非対話モード)
+GIT_SEQUENCE_EDITOR=true git rebase -i --autosquash $BASE
 
 # 4. force push (PR ブランチのみ。main には絶対にしない)
 git push --force-with-lease
 ```
 
 **注意:**
+- 対話的な rebase 編集はしない (`GIT_SEQUENCE_EDITOR=true` で自動実行する)
 - fixup は **PR ブランチ内のコミットのみ** が対象。main にマージ済みのコミットには絶対に行わない
 - `--force-with-lease` を使い、他の人の push を上書きしないようにする
 - fixup 後に CI が再度パスすることを確認してからマージする
