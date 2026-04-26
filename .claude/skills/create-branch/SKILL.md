@@ -27,11 +27,27 @@ git pull origin main
 git checkout -b <prefix>/<branch-name>
 ```
 
-### 3. 確認
+### 3. Branch Plan を生成
+
+`.claude/templates/branch-plan-template.md` をコピーして `.claude/branch-plan.md` を作成する。
+
+```bash
+cp .claude/templates/branch-plan-template.md .claude/branch-plan.md
+```
+
+テンプレート内のプレースホルダーを置換する:
+- `{branch-name}` → 作成したブランチ名
+- `{date}` → 当日の日付 (YYYY-MM-DD)
+
+「目的」セクションにユーザーから聞いた内容を記入する。
+
+### 4. 確認
 
 ```bash
 git branch --show-current
 ```
+
+Branch Plan の内容をユーザーに共有し、必要に応じて「設計・方針」セクションを一緒に埋める。
 
 ## 注意事項
 
