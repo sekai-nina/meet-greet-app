@@ -55,7 +55,7 @@ export const Button: FC<ButtonProps> = ({
 
   return (
     <Pressable
-      role="button"
+      accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled: isInactive, busy: isLoading }}
       disabled={isInactive}
