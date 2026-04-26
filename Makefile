@@ -14,8 +14,8 @@ MISE := mise exec --
 ## 初回セットアップ (mise ツール確認 + dotenvx-rs + npm install + Git hooks)
 setup:
 	@command -v mise >/dev/null || (echo "❌ mise がインストールされていません。https://mise.run を参照してください" && exit 1)
-	@echo "→ mise install (Node.js, gitleaks, supabase, eas-cli, codex)..."
-	@mise install node gitleaks supabase npm:eas-cli npm:@openai/codex
+	@echo "→ mise install (Node.js, gitleaks, supabase, eas-cli, codex, cloudflared)..."
+	@mise install node gitleaks supabase npm:eas-cli npm:@openai/codex cloudflared
 	@echo "→ dotenvx-rs の確認..."
 	@export PATH="$$HOME/.local/bin:$$PATH" && \
 	command -v dotenvx >/dev/null || ( \

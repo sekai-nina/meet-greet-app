@@ -61,7 +61,7 @@ make test          # テスト実行
 make check         # lint + typecheck + test 一括
 make storybook     # On-device Storybook 起動
 make catalog       # コンポーネントカタログを Web で開く
-make catalog-share # カタログを Cloudflare Tunnel で外部共有
+make catalog-share # カタログを Cloudflare Tunnel で外部共有 (要 cloudflared: make setup で導入)
 make db-start      # ローカル Supabase 起動
 make db-reset      # DB リセット + マイグレーション再適用
 ```
