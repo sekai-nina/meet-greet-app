@@ -2,8 +2,8 @@ import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react
 
 import { useRouter } from 'expo-router';
 
+import type { EventWithRelease } from '@/hooks/use-events';
 import { useEvents } from '@/hooks/use-events';
-import type { EventWithRelease } from '@/types';
 
 const FORMAT_LABELS: Record<string, string> = {
   online: 'オンライン',

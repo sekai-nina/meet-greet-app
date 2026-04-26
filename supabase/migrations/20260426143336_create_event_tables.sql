@@ -71,3 +71,16 @@ create table event_day_members (
 create trigger trg_event_day_members_updated_at
   before update on event_day_members
   for each row execute function set_updated_at();
+
+-- -------------------------------------------------------------
+-- RLS: イベントデータは全員読み取り可能
+-- -------------------------------------------------------------
+alter table events enable row level security;
+alter table event_days enable row level security;
+alter table event_slots enable row level security;
+alter table event_day_members enable row level security;
+
+create policy "events_select_all" on events for select using (true);
+create policy "event_days_select_all" on event_days for select using (true);
+create policy "event_slots_select_all" on event_slots for select using (true);
+create policy "event_day_members_select_all" on event_day_members for select using (true);

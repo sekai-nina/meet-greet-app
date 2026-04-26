@@ -40,6 +40,7 @@ function AuthGate() {
 export default function RootLayout() {
   useEffect(() => {
     useAuthStore.getState().initialize();
+    return () => useAuthStore.getState().dispose();
   }, []);
 
   return (

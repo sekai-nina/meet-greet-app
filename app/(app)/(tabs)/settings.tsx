@@ -66,7 +66,7 @@ export default function SettingsTab() {
           />
           <TouchableOpacity
             className="bg-blue-600 rounded-lg py-3"
-            onPress={handleLinkEmail}
+            onPress={() => void handleLinkEmail()}
             disabled={isLoading}
           >
             {isLoading ? (
@@ -82,7 +82,7 @@ export default function SettingsTab() {
 
       <TouchableOpacity
         className="border border-red-300 rounded-lg py-3"
-        onPress={handleSignOut}
+        onPress={() => void handleSignOut()}
       >
         <Text className="text-red-600 text-center font-semibold">
           ログアウト

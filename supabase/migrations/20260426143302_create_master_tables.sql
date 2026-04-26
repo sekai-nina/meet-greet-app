@@ -60,3 +60,14 @@ create table release_centers (
 create trigger trg_release_centers_updated_at
   before update on release_centers
   for each row execute function set_updated_at();
+
+-- -------------------------------------------------------------
+-- RLS: マスタデータは全員読み取り可能
+-- -------------------------------------------------------------
+alter table releases enable row level security;
+alter table members enable row level security;
+alter table release_centers enable row level security;
+
+create policy "releases_select_all" on releases for select using (true);
+create policy "members_select_all" on members for select using (true);
+create policy "release_centers_select_all" on release_centers for select using (true);

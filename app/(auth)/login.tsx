@@ -79,7 +79,7 @@ export default function LoginScreen() {
 
           <TouchableOpacity
             className="bg-blue-600 rounded-lg py-3 mb-3"
-            onPress={handleSendMagicLink}
+            onPress={() => void handleSendMagicLink()}
             disabled={isLoading}
           >
             {isLoading ? (
@@ -99,7 +99,7 @@ export default function LoginScreen() {
 
           <TouchableOpacity
             className="border border-gray-300 rounded-lg py-3"
-            onPress={handleAnonymousLogin}
+            onPress={() => void handleAnonymousLogin()}
             disabled={isLoading}
           >
             {isLoading ? (
@@ -129,7 +129,7 @@ export default function LoginScreen() {
 
           <TouchableOpacity
             className="bg-blue-600 rounded-lg py-3 mb-3"
-            onPress={handleVerifyOtp}
+            onPress={() => void handleVerifyOtp()}
             disabled={isLoading}
           >
             {isLoading ? (

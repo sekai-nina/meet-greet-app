@@ -4,17 +4,23 @@ import { useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 import { MemberChip } from '@/components/MemberChip';
-import type { EventDayWithDetails } from '@/types';
+import type { EventWithDays } from '@/hooks/use-events';
+
+type EventDayWithDetails = EventWithDays['event_days'][number];
 
 type Props = {
   eventDay: EventDayWithDetails;
 };
 
+const jstFormatter = new Intl.DateTimeFormat('ja-JP', {
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: 'Asia/Tokyo',
+  hour12: false,
+});
+
 const formatTime = (isoString: string): string => {
-  const date = new Date(isoString);
-  const hours = date.getUTCHours() + 9; // UTC → JST
-  const minutes = date.getUTCMinutes();
-  return `${hours}:${minutes.toString().padStart(2, '0')}`;
+  return jstFormatter.format(new Date(isoString));
 };
 
 export const EventDayCard: FC<Props> = ({ eventDay }) => {
