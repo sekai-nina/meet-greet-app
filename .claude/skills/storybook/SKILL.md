@@ -1,22 +1,30 @@
 ---
 name: storybook
-description: UI コンポーネントの Storybook ストーリーを作成・更新するスキル
+description: UI コンポーネントの Storybook ストーリーとコンポーネントカタログを作成・更新するスキル
 ---
 
 # Storybook スキル
 
-UI コンポーネントに対応する Storybook ストーリーを作成・更新し、コンポーネントカタログを最新に保つ。
+UI コンポーネントに対応する Storybook ストーリーと Web コンポーネントカタログを作成・更新する。
 
 ## 実行タイミング
 
 - 新しい UI コンポーネントを `components/` に追加したとき
 - 既存コンポーネントの Props を変更したとき
 - ユーザーから「Storybook に追加して」と言われたとき
+- **コンポーネント実装と同じタイミングで実行する (後回しにしない)**
 
 ## 前提
 
-- React Native 向け Storybook (`@storybook/react-native`) を使用
-- ストーリーファイルは対象コンポーネントと同階層に配置
+このプロジェクトには **2 つのコンポーネント確認の仕組み** がある。両方を更新すること。
+
+| 仕組み | コマンド | 用途 | ファイル |
+|--------|---------|------|---------|
+| **Storybook** | `make storybook` | 実機でコンポーネントの動作確認 | `components/{Name}.stories.tsx` |
+| **カタログ** | `make catalog` / `make catalog-share` | Web ブラウザでコンポーネント一覧を共有 | `app/catalog.tsx` |
+
+どちらも **実際のコンポーネントを import して使う** (コードのコピーではない)。
+コンポーネントを修正すれば、Storybook・カタログ・本番アプリすべてに反映される。
 
 ## 手順
 
@@ -58,28 +66,39 @@ export const Default: Story = {
 - **バリエーション**: Props の組み合わせごとに追加 (例: `Empty`, `Loading`, `Error`, `WithData`)
 - **エッジケース**: 長いテキスト、データなし、エラー状態など
 
-### 3. 動作確認
+### 3. コンポーネントカタログの更新
 
-Storybook を起動して、作成したストーリーが正しく表示されることを確認する。
+`app/catalog.tsx` に対象コンポーネントを追加する。
 
-### 4. コンポーネントカタログの更新
+1. コンポーネントを import する
+2. モックデータを用意する (ストーリーのモックと共通化してよい)
+3. `<Section>` で囲んで追加する
 
-`docs/components.md` が存在する場合、コンポーネント一覧を更新する。
-存在しない場合は作成し、以下を記載する:
+```typescript
+import { NewComponent } from '@/components/NewComponent';
 
-- コンポーネント名
-- 用途の簡単な説明
-- Props の一覧
-- Storybook でのパス (`components/ComponentName`)
+// catalog の return 内に追加
+<Section title="NewComponent">
+  <NewComponent prop1="value" />
+</Section>
+```
+
+**重要**: カタログは Web (SSR) で動くため、ネイティブ専用 API に依存するコンポーネントは注意が必要。
+
+### 4. 動作確認
+
+以下のいずれかで表示を確認する:
+- `make storybook` — 実機で Storybook を確認
+- `make catalog` — Web ブラウザでカタログを確認
 
 ### 5. コミット
 
-ストーリーファイルとドキュメントの変更を、対象コンポーネントの実装コミットとは **別に** コミットする。
+ストーリーファイルとカタログの変更をコミットする。
 
 ## 命名規約
 
 | 対象 | 形式 | 例 |
 |------|------|-----|
-| ストーリーファイル | `{ComponentName}.stories.tsx` | `EventDayList.stories.tsx` |
-| title | `components/{ComponentName}` | `components/EventDayList` |
+| ストーリーファイル | `{ComponentName}.stories.tsx` | `EventDayCard.stories.tsx` |
+| title | `components/{ComponentName}` | `components/EventDayCard` |
 | ストーリー名 | PascalCase で状態を表す | `Default`, `Empty`, `Loading` |
