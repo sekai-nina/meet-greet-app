@@ -4,7 +4,15 @@
 
 PLAN_FILE="${CLAUDE_PROJECT_DIR:-.}/.claude/branch-plan.md"
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
-PROJECT_HASH=$(echo "$PROJECT_DIR" | md5 2>/dev/null || echo "$PROJECT_DIR" | md5sum 2>/dev/null | cut -d' ' -f1 || echo "$PROJECT_DIR" | shasum 2>/dev/null | cut -d' ' -f1 || echo "default")
+if command -v md5 &>/dev/null; then
+  PROJECT_HASH=$(echo "$PROJECT_DIR" | md5 -q)
+elif command -v md5sum &>/dev/null; then
+  PROJECT_HASH=$(echo "$PROJECT_DIR" | md5sum | cut -d' ' -f1)
+elif command -v shasum &>/dev/null; then
+  PROJECT_HASH=$(echo "$PROJECT_DIR" | shasum | cut -d' ' -f1)
+else
+  PROJECT_HASH="default"
+fi
 COUNTER_FILE="/tmp/branch-plan-remind-counter-${PROJECT_HASH}"
 
 # branch-plan.md が存在しなければ何もしない

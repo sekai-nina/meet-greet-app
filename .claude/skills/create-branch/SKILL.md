@@ -22,8 +22,12 @@ git fetch origin main
 
 ### 2. worktree + ブランチを作成
 
+ブランチ名の `/` を `-` に置換したものを worktree ディレクトリ名にする (例: `feature/event-list` → `feature-event-list`)。
+
 ```bash
-git worktree add .claude/worktrees/<branch-name> -b <prefix>/<branch-name> origin/main
+BRANCH="<prefix>/<branch-name>"
+WORKTREE_DIR=$(echo "$BRANCH" | tr '/' '-')
+git worktree add ".claude/worktrees/$WORKTREE_DIR" -b "$BRANCH" origin/main
 ```
 
 - worktree は `.claude/worktrees/` 配下に作成される (`.gitignore` で除外済み)
@@ -31,14 +35,14 @@ git worktree add .claude/worktrees/<branch-name> -b <prefix>/<branch-name> origi
 
 ```bash
 while IFS= read -r file; do
-  [ -f "$file" ] && cp "$file" ".claude/worktrees/<branch-name>/$file"
+  [ -f "$file" ] && cp "$file" ".claude/worktrees/$WORKTREE_DIR/$file"
 done < .worktreeinclude
 ```
 
 ### 3. worktree に移動
 
 ```bash
-cd .claude/worktrees/<branch-name>
+cd ".claude/worktrees/$WORKTREE_DIR"
 ```
 
 以降の作業はこの worktree 内で行う。
