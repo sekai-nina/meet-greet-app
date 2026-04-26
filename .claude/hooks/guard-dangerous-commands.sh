@@ -31,11 +31,14 @@ COMMAND_STRIPPED=$(echo "$COMMAND" | sed \
   -e "/<<['\"]\\{0,1\\}WARN/,/^WARN/d" \
   -e "s/git commit -m .*//g" \
   -e "s/--body .*//g" \
-  -e "s/--body=.*//g")
+  -e "s/--body=.*//g" \
+  -e 's/--field body=".*"//g' \
+  -e "s/--field body='.*'//g" \
+  -e "s/--field body=.*//g")
 
 # 危険なコマンドパターン (大文字小文字区別なし)
 if echo "$COMMAND_STRIPPED" | grep -qiE \
-  "rm -rf /|rm -rf \.|git push --force|git push -f[ \t]|git push -f$|git reset --hard|git checkout \.$|git clean -f|DROP TABLE|DROP DATABASE|TRUNCATE|git branch -D main|git branch -D master"; then
+  "rm -rf /|rm -rf \.|git push --force($| )|git push -f[ \t]|git push -f$|git reset --hard|git checkout \.$|git clean -f|DROP TABLE|DROP DATABASE|TRUNCATE|git branch -D main|git branch -D master"; then
   cat <<WARN
 {
   "decision": "block",
