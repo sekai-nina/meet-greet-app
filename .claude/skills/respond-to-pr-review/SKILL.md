@@ -174,7 +174,7 @@ git push --force-with-lease
 ```
 
 **注意:**
-- `git rebase -i` は使わない (Claude Code は対話的操作をサポートしない)
+- 対話的な rebase 編集はしない (`GIT_SEQUENCE_EDITOR=true` で自動実行する)
 - fixup は **PR ブランチ内のコミットのみ** が対象。main にマージ済みのコミットには絶対に行わない
 - `--force-with-lease` を使い、他の人の push を上書きしないようにする
 - fixup 後に CI が再度パスすることを確認してからマージする

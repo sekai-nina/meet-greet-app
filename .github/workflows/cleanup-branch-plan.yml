@@ -1,20 +1,18 @@
 name: Cleanup branch plan
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches: [main]
+    paths:
+      - '.claude/branch-plan.md'
 
 jobs:
   cleanup:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: main
       - name: Remove branch-plan.md if exists
         run: |
           if [ -f .claude/branch-plan.md ]; then

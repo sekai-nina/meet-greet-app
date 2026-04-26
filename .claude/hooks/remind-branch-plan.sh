@@ -3,7 +3,8 @@
 # 毎回ではなく 5 回に 1 回だけ発火し、ノイズを抑える
 
 PLAN_FILE="${CLAUDE_PROJECT_DIR:-.}/.claude/branch-plan.md"
-PROJECT_HASH=$(echo "${CLAUDE_PROJECT_DIR:-.}" | md5sum 2>/dev/null | cut -d' ' -f1 || echo "default")
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-.}"
+PROJECT_HASH=$(echo "$PROJECT_DIR" | md5 2>/dev/null || echo "$PROJECT_DIR" | md5sum 2>/dev/null | cut -d' ' -f1 || echo "$PROJECT_DIR" | shasum 2>/dev/null | cut -d' ' -f1 || echo "default")
 COUNTER_FILE="/tmp/branch-plan-remind-counter-${PROJECT_HASH}"
 
 # branch-plan.md が存在しなければ何もしない

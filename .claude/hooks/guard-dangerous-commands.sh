@@ -12,7 +12,7 @@ if ! command -v jq &>/dev/null; then
   cat <<WARN
 {
   "decision": "block",
-  "reason": "jq が見つかりません。危険コマンドガードが機能しないためブロックします。mise install で jq をインストールしてください。"
+  "reason": "jq が見つかりません。危険コマンドガードが機能しないためブロックします。brew install jq または apt install jq でインストールしてください。"
 }
 WARN
   exit 0
