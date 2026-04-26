@@ -1,0 +1,118 @@
+name: Build & Deploy to TestFlight
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'デプロイメッセージ (Discord に表示)'
+        required: false
+        default: '手動デプロイ'
+
+concurrency:
+  group: deploy-testflight
+  cancel-in-progress: true
+
+jobs:
+  build-and-submit:
+    name: iOS Build → TestFlight → Discord 通知
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+
+      - run: npm ci
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build & Submit to TestFlight
+        id: build
+        run: |
+          # タグ or 手動入力のメッセージを決定
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            MESSAGE="$GITHUB_REF_NAME"
+          else
+            MESSAGE="$INPUT_MESSAGE"
+          fi
+          # 改行を含む可能性があるため delimiter 方式で出力
+          EOF_MARKER=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "message<<$EOF_MARKER" >> "$GITHUB_OUTPUT"
+          echo "$MESSAGE" >> "$GITHUB_OUTPUT"
+          echo "$EOF_MARKER" >> "$GITHUB_OUTPUT"
+
+          # iOS ビルド + TestFlight 提出を一括実行
+          eas build --platform ios --profile production --auto-submit --non-interactive
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          INPUT_MESSAGE: ${{ github.event.inputs.message }}
+          EXPO_ASC_KEY_ID: ${{ secrets.APPLE_ASC_KEY_ID }}
+          EXPO_ASC_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
+          EXPO_ASC_API_KEY: ${{ secrets.APPLE_ASC_KEY_P8 }}
+
+      - name: EAS Update (OTA)
+        run: |
+          eas update --channel production --message "$DEPLOY_MESSAGE" --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          DEPLOY_MESSAGE: ${{ steps.build.outputs.message }}
+
+      - name: Discord 通知 (成功)
+        if: success()
+        continue-on-error: true
+        run: |
+          jq -n \
+            --arg title "✅ ミーグリ記録 TestFlight デプロイ完了" \
+            --arg desc "$DEPLOY_MESSAGE" \
+            --arg ref "$GITHUB_REF_NAME" \
+            --arg sha "${GITHUB_SHA::7}" \
+            --arg url "$SERVER_URL/$REPO/commit/$GITHUB_SHA" \
+            '{
+              embeds: [{
+                title: $title,
+                description: $desc,
+                color: 5763719,
+                fields: [
+                  { name: "TestFlight", value: "App Store Connect で審査完了後、テスターに自動配信されます" },
+                  { name: "タグ / ブランチ", value: ("`" + $ref + "`"), inline: true },
+                  { name: "コミット", value: ("[`" + $sha + "`](" + $url + ")"), inline: true }
+                ],
+                footer: { text: "meet-greet-app | EAS Build + TestFlight" }
+              }]
+            }' | curl -sf -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK_URL"
+        env:
+          DEPLOY_MESSAGE: ${{ steps.build.outputs.message }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          SERVER_URL: ${{ github.server_url }}
+          REPO: ${{ github.repository }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Discord 通知 (失敗)
+        if: failure()
+        run: |
+          jq -n \
+            --arg desc "$DEPLOY_MESSAGE" \
+            --arg logs "$SERVER_URL/$REPO/actions/runs/$RUN_ID" \
+            '{
+              embeds: [{
+                title: "❌ ミーグリ記録 デプロイ失敗",
+                description: $desc,
+                color: 15548997,
+                fields: [
+                  { name: "Actions ログ", value: $logs }
+                ],
+                footer: { text: "meet-greet-app | EAS Build" }
+              }]
+            }' | curl -sf -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK_URL"
+        env:
+          DEPLOY_MESSAGE: ${{ steps.build.outputs.message }}
+          SERVER_URL: ${{ github.server_url }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
