@@ -45,6 +45,12 @@
 - [ ] `/create-pr` で PR を作成した（Copilot レビュー付き）
 - [ ] `/respond-to-pr-review` で Copilot のレビューコメントに対応した
 - [ ] must / should の指摘をすべて解消した
+- [ ] すべての conversation が resolved になった
+- [ ] ユーザーの最終確認を得た
+- [ ] fixup + autosquash で修正コミットを統合した
+- [ ] `--force-with-lease` で push した
+- [ ] CI が通ることを確認した
+- [ ] マージした
 
 ---
 

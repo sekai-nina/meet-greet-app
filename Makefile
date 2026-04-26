@@ -1,4 +1,4 @@
-.PHONY: setup dev lint typecheck test check db-start db-reset db-migrate eas-update clean
+.PHONY: setup dev lint typecheck test check db-start db-reset db-migrate eas-update storybook catalog catalog-share clean
 
 # mise exec 経由でコマンドを実行し、mise activate なしでも pinned ツールを使えるようにする
 # グローバル設定 (~/.tool-versions, ~/.config/mise/config.toml) を無視し、
@@ -14,8 +14,8 @@ MISE := mise exec --
 ## 初回セットアップ (mise ツール確認 + dotenvx-rs + npm install + Git hooks)
 setup:
 	@command -v mise >/dev/null || (echo "❌ mise がインストールされていません。https://mise.run を参照してください" && exit 1)
-	@echo "→ mise install (Node.js, gitleaks, supabase, eas-cli, codex)..."
-	@mise install node gitleaks supabase npm:eas-cli npm:@openai/codex
+	@echo "→ mise install (Node.js, gitleaks, supabase, eas-cli, codex, cloudflared)..."
+	@mise install node gitleaks supabase npm:eas-cli npm:@openai/codex cloudflared
 	@echo "→ dotenvx-rs の確認..."
 	@export PATH="$$HOME/.local/bin:$$PATH" && \
 	command -v dotenvx >/dev/null || ( \
@@ -67,6 +67,53 @@ test:
 
 ## lint + typecheck + test を一括実行
 check: lint typecheck test
+
+# ============================================================
+# Storybook
+# ============================================================
+
+## On-device Storybook 起動
+storybook:
+	EXPO_PUBLIC_STORYBOOK_ENABLED=true $(MISE) dotenvx run -- npx expo start
+
+## コンポーネントカタログを Web ブラウザで開く
+catalog:
+	$(MISE) dotenvx run -- npx expo start --web
+
+## カタログを Cloudflare Tunnel で外部共有 (Ctrl+C で終了)
+catalog-share:
+	@bash -c '\
+		$(MISE) dotenvx run -- npx expo start --web --port 8081 & \
+		EXPO_PID=$$!; \
+		trap "kill $$EXPO_PID 2>/dev/null; exit" INT TERM EXIT; \
+		echo "→ Expo Web 起動待機中..."; \
+		EXPO_READY=false; \
+		for i in $$(seq 1 30); do \
+			if curl -s http://localhost:8081 >/dev/null 2>&1; then EXPO_READY=true; break; fi; \
+			sleep 1; \
+		done; \
+		if [ "$$EXPO_READY" = false ]; then \
+			echo "❌ Expo Web の起動に失敗しました (30 秒タイムアウト)"; \
+			exit 1; \
+		fi; \
+		echo "→ Cloudflare Tunnel を起動中..."; \
+		$(MISE) cloudflared tunnel --url http://localhost:8081 2>&1 \
+		| while IFS= read -r line; do \
+			echo "$$line"; \
+			url=$$(echo "$$line" | grep -oE "https://[a-z0-9-]+\.trycloudflare\.com"); \
+			if [ -n "$$url" ]; then \
+				echo ""; \
+				echo "========================================"; \
+				echo "  共有 URL: $$url/catalog"; \
+				echo "========================================"; \
+				echo ""; \
+				if command -v pbcopy >/dev/null 2>&1; then \
+					echo "$$url/catalog" | pbcopy; \
+					echo "  (クリップボードにコピーしました)"; \
+				fi; \
+			fi; \
+		done \
+	'
 
 # ============================================================
 # Supabase
