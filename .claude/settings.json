@@ -17,6 +17,15 @@
             "command": ".claude/hooks/plan-review.sh"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/remind-branch-plan.sh"
+          }
+        ]
       }
     ]
   }
