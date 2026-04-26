@@ -1,6 +1,6 @@
 # Create Branch
 
-新しいブランチを作成するワークフロー。
+新しいブランチを作成するワークフロー。Issue 番号を指定すると、Issue の情報を自動で取得して Branch Plan に反映する。
 
 ## ブランチ命名規約
 
@@ -38,8 +38,19 @@ cp .claude/templates/branch-plan-template.md .claude/branch-plan.md
 テンプレート内のプレースホルダーを置換する:
 - `{branch-name}` → 作成したブランチ名
 - `{date}` → 当日の日付 (YYYY-MM-DD)
+- `{issue-number}` → Issue 番号 (指定がなければ空欄)
 
-「目的」セクションにユーザーから聞いた内容を記入する。
+### 3.5. Issue 情報の取得 (Issue 番号が指定された場合)
+
+```bash
+gh issue view <number> --json title,body
+```
+
+取得した情報を Branch Plan に反映する:
+- Issue の「目的」セクションの内容を Branch Plan の「目的」に転記する
+- Issue の「受け入れ条件」を Branch Plan の「メモ」に転記する
+
+Issue 番号が指定されていない場合は、ユーザーから聞いた内容を「目的」に記入する。
 
 ### 4. 確認
 
