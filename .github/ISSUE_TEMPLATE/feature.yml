@@ -1,0 +1,44 @@
+name: 機能追加・改善
+description: 新機能の追加や既存機能の改善
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 目的
+      description: この Issue が完了したときに得られる価値
+      placeholder: "例: ユーザーがマジックリンクでログインできるようになる"
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: 受け入れ条件
+      description: 完了と判断するための条件
+      value: |
+        - [ ] 条件1
+        - [ ] 条件2
+        - [ ] 条件3
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: スコープ
+      description: In Scope と Out of Scope を明記
+      value: |
+        ### In Scope
+        -
+
+        ### Out of Scope
+        -
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: 備考
+      description: 依存関係、テスト観点、その他
+      placeholder: "任意。依存 Issue、テスト方針、参考資料など"
+    validations:
+      required: false
