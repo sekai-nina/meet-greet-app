@@ -1,23 +1,51 @@
 import '../global.css';
 
-import { Stack } from 'expo-router';
+import { useEffect } from 'react';
 
-const IS_STORYBOOK_ENABLED =
-  __DEV__ && process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === 'true';
+import { Slot, useRouter, useSegments } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+
+import { QueryClientProvider } from '@tanstack/react-query';
+
+import { useAuth } from '@/hooks/use-auth';
+import { queryClient } from '@/lib/query-client';
+import { useAuthStore } from '@/stores/auth-store';
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
+function AuthGate() {
+  const { isAuthenticated, isInitialized } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    SplashScreen.hideAsync().catch(() => {});
+
+    const rootSegment = segments[0];
+    const isInAuthGroup = rootSegment === '(auth)';
+    const isDevRoute = rootSegment === 'catalog' || rootSegment === 'storybook';
+
+    if (!isAuthenticated && !isInAuthGroup && !isDevRoute) {
+      router.replace('/(auth)/login');
+    } else if (isAuthenticated && isInAuthGroup) {
+      router.replace('/(app)/(tabs)');
+    }
+  }, [isAuthenticated, isInitialized, segments, router]);
+
+  return <Slot />;
+}
 
 export default function RootLayout() {
+  useEffect(() => {
+    useAuthStore.getState().initialize();
+    return () => useAuthStore.getState().dispose();
+  }, []);
+
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ title: 'ミーグリ記録' }} />
-      {IS_STORYBOOK_ENABLED && (
-        <Stack.Screen name="storybook" options={{ headerShown: false }} />
-      )}
-      {__DEV__ && (
-        <Stack.Screen
-          name="catalog"
-          options={{ title: 'コンポーネントカタログ' }}
-        />
-      )}
-    </Stack>
+    <QueryClientProvider client={queryClient}>
+      <AuthGate />
+    </QueryClientProvider>
   );
 }

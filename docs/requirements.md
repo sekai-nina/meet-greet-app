@@ -200,8 +200,11 @@
 
 ```
 releases  (シングル or アルバム)
-  id, title, number, release_date, center_member,
+  id, title, number, release_date,
   release_type (single|album)
+
+release_centers  (リリースのセンター、ダブルセンター対応)
+  release_id, member_id, center_order
 
 events  (1リリースに複数紐づく場合あり)
   id, release_id, format (online|offline)
@@ -210,7 +213,10 @@ members
   id, name, generation, birthday
 
 event_days
-  id, event_id, day_number, date, slot_count
+  id, event_id, day_number, date
+
+event_slots  (部 / 時間帯スロット)
+  id, event_day_id, slot_number, starts_at, ends_at
 
 event_day_members  (出演メンバー)
   event_day_id, member_id
@@ -248,7 +254,7 @@ plan_round_slots  (受付次別計画)
 | ログイン | マジックリンク or 匿名 | メール入力 / 匿名ログイン |
 | ホーム | 直近のイベント・自分の記録サマリー | イベント選択 |
 | イベント一覧 | リリース別イベント一覧 | 検索 / フィルタ |
-| イベント詳細 | 開催日・受付次・完売状況 | 開催日選択 |
+| イベント詳細 | 開催日・部・出演メンバー表示 | 開催日展開 |
 | 記録入力 | マトリックス形式で記録入力 | セルタップ→ステータス切替 |
 | 記録一覧 | 自分の記録をシングル別表示 | フィルタ / 集計表示 |
 | 購買計画 (v2) | 理想/確保/受付次別マトリックス | セル入力 / 差分確認 |
