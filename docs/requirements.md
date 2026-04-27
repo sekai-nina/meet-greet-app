@@ -292,7 +292,8 @@ event_day_members  (出演メンバー)
   event_day_id, member_id
 
 reception_rounds  (受付次)
-  id, event_id, round_number, start_at, end_at
+  id, event_id, round_number, start_at, end_at,
+  max_applications (申込回数上限: 1次=1, 2次=3, 3次以降=5)
 
 reception_round_targets  (受付次 × 応募可能な開催日)
   reception_round_id, event_day_id, is_final_round
@@ -324,7 +325,7 @@ user_purchase_policies  (購買ポリシー設定)
   budget_limit, sheet_limit (予算・枚数上限)
 ```
 
-## 5. 画面構成 (v1)
+## 5. 画面構成
 
 | 画面 | 概要 | 主な操作 |
 |------|------|----------|
@@ -346,7 +347,7 @@ CLAUDE.md に記載の通り:
 - **フロントエンド**: React Native + Expo (TypeScript)
 - **ルーティング**: Expo Router
 - **バックエンド**: Supabase (Auth / Postgres / RLS)
-- **状態管理**: Zustand or TanStack Query
+- **状態管理**: Zustand + TanStack Query
 - **スタイリング**: NativeWind
 - **リンター**: ESLint + Prettier + TypeScript strict
 
