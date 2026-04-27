@@ -12,10 +12,13 @@ jobs:
     steps:
       - name: Lightweight query
         run: |
-          curl -sf "${SUPABASE_URL}/rest/v1/?limit=0" \
-            -H "apikey: ${SUPABASE_ANON_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
-            -o /dev/null
+          HTTP_STATUS=$(curl -sS --fail-with-body \
+            -w "%{http_code}" \
+            -o /dev/null \
+            "${EXPO_PUBLIC_SUPABASE_URL}/rest/v1/?limit=0" \
+            -H "apikey: ${EXPO_PUBLIC_SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${EXPO_PUBLIC_SUPABASE_ANON_KEY}")
+          echo "HTTP status: ${HTTP_STATUS}"
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
