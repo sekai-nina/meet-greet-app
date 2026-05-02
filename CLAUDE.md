@@ -59,9 +59,6 @@ make lint          # ESLint
 make typecheck     # TypeScript 型チェック
 make test          # テスト実行
 make check         # lint + typecheck + test 一括
-make storybook     # On-device Storybook 起動 (実機でコンポーネント確認)
-make catalog       # Web コンポーネントカタログを開く (ブラウザで確認)
-make catalog-share # カタログを Cloudflare Tunnel で外部共有
 make db-start      # ローカル Supabase 起動
 make db-reset      # DB リセット + マイグレーション再適用
 ```
@@ -91,15 +88,3 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=
 | `:art:` | UI デザイン・スタイリング |
 | `:ballet_shoes:` | DB スキーマ・マイグレーション |
 
-## コンポーネント確認の仕組み
-
-プロジェクトには **2 つのコンポーネント確認の仕組み** がある。コンポーネントを追加・変更したら **両方** を更新する。
-
-| 仕組み | コマンド | 用途 | 更新対象 |
-|--------|---------|------|---------|
-| **Storybook** | `make storybook` | 実機でバリエーション・インタラクション確認 | `components/{Name}.stories.tsx` |
-| **カタログ** | `make catalog` / `make catalog-share` | Web ブラウザで一覧共有・外部レビュー | `app/catalog.tsx` |
-
-- どちらも **実際のコンポーネントを import して呼び出す** (コードのコピーではない)
-- コンポーネントを修正すれば Storybook・カタログ・本番アプリすべてに反映される
-- 詳細は `.claude/skills/storybook/SKILL.md` を参照

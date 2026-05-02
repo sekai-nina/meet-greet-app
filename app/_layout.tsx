@@ -25,9 +25,8 @@ function AuthGate() {
 
     const rootSegment = segments[0];
     const isInAuthGroup = rootSegment === '(auth)';
-    const isDevRoute = rootSegment === 'catalog' || rootSegment === 'storybook';
 
-    if (!isAuthenticated && !isInAuthGroup && !isDevRoute) {
+    if (!isAuthenticated && !isInAuthGroup) {
       router.replace('/(auth)/login');
     } else if (isAuthenticated && isInAuthGroup) {
       router.replace('/(app)/(tabs)');
