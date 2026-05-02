@@ -39,15 +39,14 @@ git diff
 | :robot: | `:robot:` | CI/CD・自動化 | GitHub Actions、EAS 設定、hooks |
 | :icecream: | `:icecream:` | ドキュメント更新 | domain.md、requirements.md、README |
 | :bubbles: | `:bubbles:` | 依存・設定・環境変更 | package.json、dotenvx、devcontainer |
-| :art: | `:art:` | UI デザイン・スタイリング | Storybook、NativeWind テーマ、アイコン |
+| :art: | `:art:` | UI デザイン・スタイリング | NativeWind テーマ、アイコン |
 | :ballet_shoes: | `:ballet_shoes:` | DB スキーマ・マイグレーション | テーブル追加、RLS ポリシー、SQL |
 
 **使い分けのポイント:**
 - テストと CI は分ける — `:soccer:` はテストコード、`:robot:` は CI ワークフロー
 - TDD の Red (失敗するテスト追加) も `:soccer:`
 - ユビキタス言語の更新は `:icecream:`
-- Storybook ストーリーの追加・更新は `:art:`
-- NativeWind のテーマ変更やアイコン差し替えも `:art:`
+- NativeWind のテーマ変更やアイコン差し替えは `:art:`
 - NativeWind の初期設定やESLint 設定の変更は `:bubbles:`
 
 **メッセージ構成:**
