@@ -16,6 +16,12 @@ paths:
 - 複雑・再利用性の高いスタイルやパフォーマンスが重要な箇所では `StyleSheet.create` も許可する
 - ハードコードされた色・サイズは使わない。NativeWind のテーマまたは定数で管理する
 
+## ローディング表示
+
+- 画面レベル・セクションレベルの非同期待ち (データ取得中等) には `LoadingSpinner` (`components/LoadingSpinner.tsx`) を使う
+- `ActivityIndicator` を画面の読み込み表示に直接使わない。`ActivityIndicator` はボタン内部など局所的なインジケータとしてのみ許可する
+- TanStack Query の `isLoading` / `isPending` 状態では必ず `LoadingSpinner` を表示する
+
 ## 画面コンポーネント (app/ 配下)
 
 - データ取得とレイアウトに集中し、ビジネスロジックはカスタムフックに切り出す
