@@ -14,9 +14,9 @@ type ButtonProps = {
 };
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: 'bg-blue-600 active:bg-blue-700',
-  secondary: 'bg-gray-600 active:bg-gray-700',
-  outline: 'border-2 border-blue-600 bg-transparent active:bg-blue-50',
+  primary: 'bg-primary active:bg-primary/80',
+  secondary: 'bg-text-muted active:bg-text',
+  outline: 'border-2 border-primary bg-transparent active:bg-primary-soft',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
@@ -26,9 +26,9 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
 };
 
 const TEXT_VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: 'text-white',
+  primary: 'text-text',
   secondary: 'text-white',
-  outline: 'text-blue-600',
+  outline: 'text-primary',
 };
 
 const TEXT_SIZE_CLASSES: Record<ButtonSize, string> = {
@@ -38,9 +38,9 @@ const TEXT_SIZE_CLASSES: Record<ButtonSize, string> = {
 };
 
 const INDICATOR_COLOR: Record<ButtonVariant, string> = {
-  primary: '#ffffff',
+  primary: '#14253A',
   secondary: '#ffffff',
-  outline: '#2563eb',
+  outline: '#5BBEE5',
 };
 
 export const Button: FC<ButtonProps> = ({

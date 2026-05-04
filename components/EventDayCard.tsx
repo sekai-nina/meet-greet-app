@@ -32,7 +32,7 @@ export const EventDayCard: FC<Props> = ({ eventDay }) => {
   const members = eventDay.event_day_members.map((edm) => edm.members);
 
   return (
-    <View className="bg-white rounded-xl border border-gray-200 p-4 mb-3">
+    <View className="bg-white rounded-xl border border-border p-4 mb-3">
       <TouchableOpacity
         onPress={() => setIsExpanded(!isExpanded)}
         accessibilityRole="button"
@@ -44,12 +44,12 @@ export const EventDayCard: FC<Props> = ({ eventDay }) => {
             <Text className="text-lg font-bold">
               DAY{eventDay.day_number}
             </Text>
-            <Text className="text-sm text-gray-500 mt-1">
+            <Text className="text-sm text-text-muted mt-1">
               {eventDay.date}
             </Text>
           </View>
           <View className="flex-row items-center">
-            <Text className="text-sm text-gray-500 mr-2">
+            <Text className="text-sm text-text-muted mr-2">
               {sortedSlots.length}部 / {members.length}名
             </Text>
             <Text className="text-gray-400">
@@ -61,22 +61,22 @@ export const EventDayCard: FC<Props> = ({ eventDay }) => {
 
       {isExpanded && (
         <View className="mt-4">
-          <Text className="text-sm font-semibold text-gray-700 mb-2">
+          <Text className="text-sm font-semibold text-text mb-2">
             部
           </Text>
           {sortedSlots.map((slot) => (
             <View
               key={slot.id}
-              className="flex-row justify-between py-2 border-b border-gray-100"
+              className="flex-row justify-between py-2 border-b border-divider"
             >
               <Text className="text-sm">第{slot.slot_number}部</Text>
-              <Text className="text-sm text-gray-500">
+              <Text className="text-sm text-text-muted">
                 {formatTime(slot.starts_at)}〜{formatTime(slot.ends_at)}
               </Text>
             </View>
           ))}
 
-          <Text className="text-sm font-semibold text-gray-700 mt-4 mb-2">
+          <Text className="text-sm font-semibold text-text mt-4 mb-2">
             出演メンバー
           </Text>
           <View className="flex-row flex-wrap">
