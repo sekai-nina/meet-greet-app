@@ -12,12 +12,13 @@ export default function AppLayout() {
   }
 
   return (
-    <Stack>
+    <Stack screenOptions={{ headerBackTitle: '戻る' }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
         name="events/[id]"
-        options={{ title: 'イベント詳細', headerBackTitle: '戻る' }}
+        options={{ title: 'イベント詳細' }}
       />
+      <Stack.Screen name="home" options={{ headerShown: false }} />
     </Stack>
   );
 }

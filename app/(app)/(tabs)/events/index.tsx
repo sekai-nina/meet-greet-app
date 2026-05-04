@@ -1,14 +1,11 @@
-import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 import { useRouter } from 'expo-router';
 
 import type { EventWithRelease } from '@/hooks/use-events';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { FORMAT_LABELS } from '@/lib/format-labels';
 import { useEvents } from '@/hooks/use-events';
-
-const FORMAT_LABELS: Record<string, string> = {
-  online: 'オンライン',
-  offline: 'オフライン',
-};
 
 export default function EventsTab() {
   const { data: events, isLoading, error, refetch } = useEvents();
@@ -21,7 +18,7 @@ export default function EventsTab() {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" />
+        <LoadingSpinner />
       </View>
     );
   }
@@ -33,10 +30,10 @@ export default function EventsTab() {
           データの取得に失敗しました
         </Text>
         <TouchableOpacity
-          className="bg-blue-600 rounded-lg px-6 py-3"
+          className="bg-primary rounded-lg px-6 py-3"
           onPress={() => void refetch()}
         >
-          <Text className="text-white font-semibold">再試行</Text>
+          <Text className="text-text font-semibold">再試行</Text>
         </TouchableOpacity>
       </View>
     );
@@ -45,28 +42,28 @@ export default function EventsTab() {
   if (!events?.length) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <Text className="text-gray-500">イベントがありません</Text>
+        <Text className="text-text-muted">イベントがありません</Text>
       </View>
     );
   }
 
   return (
     <FlatList
-      className="flex-1 bg-gray-50"
+      className="flex-1 bg-bg"
       contentContainerStyle={{ padding: 16 }}
       data={events}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <TouchableOpacity
-          className="bg-white rounded-xl border border-gray-200 p-4 mb-3"
+          className="bg-white rounded-xl border border-border p-4 mb-3"
           onPress={() => handlePress(item)}
           accessibilityRole="button"
           accessibilityLabel={`${item.releases.title} ${FORMAT_LABELS[item.format] ?? item.format}`}
         >
           <Text className="text-lg font-bold">{item.releases.title}</Text>
           <View className="flex-row items-center mt-2">
-            <View className="bg-blue-100 rounded-full px-3 py-1">
-              <Text className="text-xs text-blue-800 font-medium">
+            <View className="bg-primary-soft rounded-full px-3 py-1">
+              <Text className="text-xs text-text font-medium">
                 {FORMAT_LABELS[item.format] ?? item.format}
               </Text>
             </View>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import {
-  ActivityIndicator,
+  ActivityIndicator, // eslint-disable-line no-restricted-imports -- ボタン内インジケータ
   Alert,
   Text,
   TextInput,
@@ -60,14 +60,14 @@ export default function LoginScreen() {
   return (
     <View className="flex-1 justify-center px-8 bg-white">
       <Text className="text-3xl font-bold text-center mb-2">ミーグリ記録</Text>
-      <Text className="text-base text-gray-500 text-center mb-10">
+      <Text className="text-base text-text-muted text-center mb-10">
         日向坂46 ミート&グリート管理
       </Text>
 
       {step === 'email' ? (
         <>
           <TextInput
-            className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base"
+            className="border border-border rounded-lg px-4 py-3 mb-4 text-base"
             placeholder="メールアドレス"
             value={email}
             onChangeText={setEmail}
@@ -78,7 +78,7 @@ export default function LoginScreen() {
           />
 
           <TouchableOpacity
-            className="bg-blue-600 rounded-lg py-3 mb-3"
+            className="bg-primary rounded-lg py-3 mb-3"
             onPress={() => void handleSendMagicLink()}
             disabled={isLoading}
           >
@@ -93,19 +93,19 @@ export default function LoginScreen() {
 
           <View className="flex-row items-center my-4">
             <View className="flex-1 h-px bg-gray-300" />
-            <Text className="mx-4 text-gray-500">または</Text>
+            <Text className="mx-4 text-text-muted">または</Text>
             <View className="flex-1 h-px bg-gray-300" />
           </View>
 
           <TouchableOpacity
-            className="border border-gray-300 rounded-lg py-3"
+            className="border border-border rounded-lg py-3"
             onPress={() => void handleAnonymousLogin()}
             disabled={isLoading}
           >
             {isLoading ? (
               <ActivityIndicator color="gray" />
             ) : (
-              <Text className="text-gray-700 text-center font-semibold text-base">
+              <Text className="text-text text-center font-semibold text-base">
                 匿名でログイン
               </Text>
             )}
@@ -113,12 +113,12 @@ export default function LoginScreen() {
         </>
       ) : (
         <>
-          <Text className="text-sm text-gray-600 mb-4 text-center">
+          <Text className="text-sm text-text-muted mb-4 text-center">
             {email} に認証コードを送信しました
           </Text>
 
           <TextInput
-            className="border border-gray-300 rounded-lg px-4 py-3 mb-4 text-base text-center tracking-widest"
+            className="border border-border rounded-lg px-4 py-3 mb-4 text-base text-center tracking-widest"
             placeholder="認証コード (6桁)"
             value={otpToken}
             onChangeText={setOtpToken}
@@ -128,7 +128,7 @@ export default function LoginScreen() {
           />
 
           <TouchableOpacity
-            className="bg-blue-600 rounded-lg py-3 mb-3"
+            className="bg-primary rounded-lg py-3 mb-3"
             onPress={() => void handleVerifyOtp()}
             disabled={isLoading}
           >
@@ -142,7 +142,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => setStep('email')}>
-            <Text className="text-blue-600 text-center text-sm">
+            <Text className="text-primary text-center text-sm">
               メールアドレスを変更する
             </Text>
           </TouchableOpacity>
