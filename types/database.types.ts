@@ -78,6 +78,7 @@ export type Database = {
           event_id: string
           id: string
           updated_at: string
+          venue: string | null
         }
         Insert: {
           created_at?: string
@@ -86,6 +87,7 @@ export type Database = {
           event_id: string
           id?: string
           updated_at?: string
+          venue?: string | null
         }
         Update: {
           created_at?: string
@@ -94,6 +96,7 @@ export type Database = {
           event_id?: string
           id?: string
           updated_at?: string
+          venue?: string | null
         }
         Relationships: [
           {
@@ -145,24 +148,33 @@ export type Database = {
       }
       events: {
         Row: {
+          cd_type: string
           created_at: string
           format: string
+          fortune_url: string | null
           id: string
           release_id: string
+          unit_price: number
           updated_at: string
         }
         Insert: {
+          cd_type: string
           created_at?: string
           format: string
+          fortune_url?: string | null
           id?: string
           release_id: string
+          unit_price: number
           updated_at?: string
         }
         Update: {
+          cd_type?: string
           created_at?: string
           format?: string
+          fortune_url?: string | null
           id?: string
           release_id?: string
+          unit_price?: number
           updated_at?: string
         }
         Relationships: [
@@ -241,6 +253,354 @@ export type Database = {
           },
         ]
       }
+      // MANUAL: 以下のテーブルは手動追加。db-reset 後に supabase gen types で再生成すること
+      registrations: {
+        Row: {
+          id: string
+          user_id: string
+          reception_round_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          reception_round_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          reception_round_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registrations_reception_round_id_fkey"
+            columns: ["reception_round_id"]
+            isOneToOne: false
+            referencedRelation: "reception_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      registration_items: {
+        Row: {
+          id: string
+          registration_id: string
+          event_slot_id: string
+          member_id: string
+          applied_count: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          registration_id: string
+          event_slot_id: string
+          member_id: string
+          applied_count: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          registration_id?: string
+          event_slot_id?: string
+          member_id?: string
+          applied_count?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_items_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      registration_rates: {
+        Row: {
+          id: string
+          registration_id: string
+          member_id: string
+          expected_win_rate: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          registration_id: string
+          member_id: string
+          expected_win_rate: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          registration_id?: string
+          member_id?: string
+          expected_win_rate?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registration_rates_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reception_rounds: {
+        Row: {
+          id: string
+          event_id: string
+          round_number: number
+          start_at: string
+          end_at: string
+          max_applications: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          event_id: string
+          round_number: number
+          start_at: string
+          end_at: string
+          max_applications: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          event_id?: string
+          round_number?: number
+          start_at?: string
+          end_at?: string
+          max_applications?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reception_rounds_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reception_round_targets: {
+        Row: {
+          reception_round_id: string
+          event_day_id: string
+          is_final_round: boolean
+          created_at: string
+        }
+        Insert: {
+          reception_round_id: string
+          event_day_id: string
+          is_final_round?: boolean
+          created_at?: string
+        }
+        Update: {
+          reception_round_id?: string
+          event_day_id?: string
+          is_final_round?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reception_round_targets_reception_round_id_fkey"
+            columns: ["reception_round_id"]
+            isOneToOne: false
+            referencedRelation: "reception_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reception_round_targets_event_day_id_fkey"
+            columns: ["event_day_id"]
+            isOneToOne: false
+            referencedRelation: "event_days"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      round_applications: {
+        Row: {
+          id: string
+          user_id: string
+          reception_round_id: string
+          event_slot_id: string
+          member_id: string
+          applied_count: number
+          won_count: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          reception_round_id: string
+          event_slot_id: string
+          member_id: string
+          applied_count: number
+          won_count?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          reception_round_id?: string
+          event_slot_id?: string
+          member_id?: string
+          applied_count?: number
+          won_count?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_applications_reception_round_id_fkey"
+            columns: ["reception_round_id"]
+            isOneToOne: false
+            referencedRelation: "reception_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "round_applications_event_slot_id_fkey"
+            columns: ["event_slot_id"]
+            isOneToOne: false
+            referencedRelation: "event_slots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "round_applications_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      round_application_rates: {
+        Row: {
+          user_id: string
+          reception_round_id: string
+          member_id: string
+          expected_win_rate: number
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          reception_round_id: string
+          member_id: string
+          expected_win_rate: number
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          reception_round_id?: string
+          member_id?: string
+          expected_win_rate?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "round_application_rates_reception_round_id_fkey"
+            columns: ["reception_round_id"]
+            isOneToOne: false
+            referencedRelation: "reception_rounds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "round_application_rates_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_oshi_members: {
+        Row: {
+          user_id: string
+          member_id: string
+          display_order: number
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          member_id: string
+          display_order?: number
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          member_id?: string
+          display_order?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_oshi_members_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance_records: {
+        Row: {
+          id: string
+          user_id: string
+          event_slot_id: string
+          member_id: string
+          status: string
+          memo: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          event_slot_id: string
+          member_id: string
+          status: string
+          memo?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          event_slot_id?: string
+          member_id?: string
+          status?: string
+          memo?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_event_slot_id_fkey"
+            columns: ["event_slot_id"]
+            isOneToOne: false
+            referencedRelation: "event_slots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "attendance_records_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       releases: {
         Row: {
           created_at: string
@@ -272,11 +632,49 @@ export type Database = {
         Relationships: []
       }
     }
+    // MANUAL: ビューの型定義
     Views: {
-      [_ in never]: never
+      v_participation_status: {
+        Row: {
+          user_id: string
+          event_id: string
+          event_day_id: string
+          slot_number: number
+          event_slot_id: string
+          member_id: string
+          status: string
+          total_applied: number
+          total_won: number
+          pending_count: number
+        }
+        Relationships: []
+      }
+      v_user_release_summary: {
+        Row: {
+          user_id: string
+          release_id: string
+          total_applied: number
+          total_won: number
+          total_cost: number
+          used_serials: number
+          pending_serials: number
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_slot_popularity: {
+        Args: {
+          p_event_id: string
+          p_member_id: string
+        }
+        Returns: {
+          event_slot_id: string
+          event_day_id: string
+          slot_number: number
+          popularity_level: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

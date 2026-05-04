@@ -1,14 +1,11 @@
-import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 import { useLocalSearchParams } from 'expo-router';
 
 import { EventDayCard } from '@/components/EventDayCard';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { FORMAT_LABELS } from '@/lib/format-labels';
 import { useEventDetail } from '@/hooks/use-events';
-
-const FORMAT_LABELS: Record<string, string> = {
-  online: 'オンライン',
-  offline: 'オフライン',
-};
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -17,7 +14,7 @@ export default function EventDetailScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" />
+        <LoadingSpinner />
       </View>
     );
   }
@@ -29,7 +26,7 @@ export default function EventDetailScreen() {
           データの取得に失敗しました
         </Text>
         <TouchableOpacity
-          className="bg-blue-600 rounded-lg px-6 py-3"
+          className="bg-primary rounded-lg px-6 py-3"
           onPress={() => void refetch()}
         >
           <Text className="text-white font-semibold">再試行</Text>
@@ -44,7 +41,7 @@ export default function EventDetailScreen() {
 
   return (
     <FlatList
-      className="flex-1 bg-gray-50"
+      className="flex-1 bg-bg"
       contentContainerStyle={{ padding: 16 }}
       data={sortedDays}
       keyExtractor={(item) => item.id}
@@ -52,12 +49,12 @@ export default function EventDetailScreen() {
         <View className="mb-4">
           <Text className="text-2xl font-bold">{event.releases.title}</Text>
           <View className="flex-row items-center mt-2">
-            <View className="bg-blue-100 rounded-full px-3 py-1">
-              <Text className="text-xs text-blue-800 font-medium">
+            <View className="bg-primary-soft rounded-full px-3 py-1">
+              <Text className="text-xs text-text font-medium">
                 {FORMAT_LABELS[event.format] ?? event.format}
               </Text>
             </View>
-            <Text className="text-sm text-gray-500 ml-3">
+            <Text className="text-sm text-text-muted ml-3">
               {sortedDays.length}日程
             </Text>
           </View>

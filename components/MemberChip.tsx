@@ -11,7 +11,7 @@ type Props = {
 export const MemberChip: FC<Props> = ({ member }) => {
   return (
     <View className="bg-gray-100 rounded-full px-3 py-1 mr-2 mb-2">
-      <Text className="text-sm text-gray-800">{member.name}</Text>
+      <Text className="text-sm text-text">{member.name}</Text>
     </View>
   );
 };

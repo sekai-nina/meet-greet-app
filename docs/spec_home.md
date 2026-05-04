@@ -15,7 +15,7 @@ Home タブから到達可能な画面群を対象とする。
 | H5b | 計画の確認 (初回限定盤) | `nTu5v` | push | シリアル枚数の確認 → 登録 |
 | M1 | 人気状況モーダル | `1d6N0` | modal | メンバー×日程×部のヒートマップ (◎○△×) |
 | M2 | 受付スケジュール一覧 | `s46Wt` | bottom sheet | 全受付次のリスト (通常盤 + 初回限定盤) |
-| M3 | 支払い見込み | `3g7NX` | bottom sheet | シリアル購入費 + 当選分支払い + 支払済の内訳 |
+| M3 | 費用見積もり | `3g7NX` | bottom sheet | シリアル購入費 + 当選分支払い + 支払済の内訳 |
 | M4 | メンバーフィルター | `gCLhf` | tooltip | H1 のヒートマップ用メンバー絞り込み |
 
 ---
@@ -27,7 +27,7 @@ flowchart TD
     H1[H1: ホーム] -->|CurrentSingleCard<br/>詳細を見る| H2[H2: 日程詳細]
     H1 -->|FAB 申込む| H3[H3: 申込み種別選択]
     H1 -->|受付スケジュール<br/>すべて見る| M2[M2: 受付スケジュール一覧]
-    H1 -->|ウォレットボタン| M3[M3: 支払い見込み]
+    H1 -->|ウォレットボタン| M3[M3: 費用見積もり]
     H1 -->|メンバーフィルター| M4[M4: メンバーフィルター]
 
     H2 -->|申込むボタン| H3
@@ -139,8 +139,7 @@ EventDetail (hvdbv)
 ├── statusBar
 ├── navBar
 │   ├── navBack: icon "arrow-left"
-│   ├── navTitle: "日程詳細"
-│   └── applyBtn: [icon "plus"] "申込む" → H3 へ遷移
+│   └── navTitle: "日程詳細"
 └── scroll (ohzwO) [layout: vertical, gap: 16]
     ├── onlineSection [通常版 オンラインミーグリ]
     │   ├── onlineHeader: icon "monitor" + "通常版 オンラインミーグリ"
@@ -163,13 +162,14 @@ EventDetail (hvdbv)
     │   └── realScheduleCard [タイムテーブル]
     │       ├── notice (同上)
     │       └── 1部〜4部 (時間帯は event_slots マスターデータから動的表示)
-    └── feOnlineSection [初回限定盤 オンラインミーグリ]
-        ├── feOnlineHeader: icon "star" + "初回限定盤 オンラインミーグリ"
-        ├── feOnlineDateCard [開催日程リスト]
-        │   └── DAY1 の日付 (1日程)
-        └── feOnlineScheduleCard [タイムテーブル]
-            ├── notice (同上)
-            └── 1部〜4部
+    ├── feOnlineSection [初回限定盤 オンラインミーグリ]
+    │   ├── feOnlineHeader: icon "star" + "初回限定盤 オンラインミーグリ"
+    │   ├── feOnlineDateCard [開催日程リスト]
+    │   │   └── DAY1 の日付 (1日程)
+    │   └── feOnlineScheduleCard [タイムテーブル]
+    │       ├── notice (同上)
+    │       └── 1部〜4部
+    └── applyBtn: Button label="申込む" → H3 へ遷移
 ```
 
 ---
@@ -201,9 +201,9 @@ ApplyTypeSelect (Co33m)
 ```
 ApplyRegister (bxh4x)
 ├── navBar
-│   ├── navBack + navTitle: "申込み登録"
-│   └── popularityBtn: icon "squares-four" → M1 を開く
+│   └── navBack + navTitle: "申込み登録"
 └── formScroll
+    ├── popularityBtn: icon "chart-bar" (Phosphor ChartBar) → M1 を開く
     ├── roundField: "受付次数" / [第4次 ▼] ドロップダウン
     │   ※ 全受付次を選択可能。デフォルト: 受付中があればそれ、なければ次の受付次
     ├── memberField: "メンバー" / [坂井新奈 ▼] ドロップダウン
@@ -235,14 +235,15 @@ ApplyRegister (bxh4x)
 
 ```
 ApplyRegisterFirstEdition (CTY7w / 8asKV)
-├── navBar: "申込み登録" + popularityBtn (→ M1)
+├── navBar: "申込み登録"
 └── formScroll
+    ├── popularityBtn: icon "chart-bar" (Phosphor ChartBar) → M1 を開く
     ├── serialCodeCount: "使用シリアルコード数" / "9枚"
     │   ※ 実態は応募口数の合計 (= applied_count の合算)。物理シリアル枚数とは一致しない場合がある
     ├── roundField: "受付次数" / [1次 ▼]
     ├── memberField: "メンバー" / [坂井新奈 ▼]
     ├── typeField: "形式"
-    │   └── typeToggle: [初回限定オンライン] [リアルミーグリ]
+    │   └── typeToggle: [リアルミーグリ] [初回限定オンライン]
     │       ※ トグルは表示する日程セクションを切替えるだけで、両形式の入力内容は常に保持される
     │       ※ シリアル 1 枚でオンライン・リアルどちらにも応募可能
     │
@@ -310,6 +311,7 @@ ApplyPlanConfirmFE (nTu5v)
     │   └── 合計シリアルコード数: 16枚
     └── submitButton: "登録する"
     ※ 「予想当選割合」「見込み費用」はなし (シリアルは購入済みのため)
+    ※ v1: 使用済みシリアル数はハードコード 0。実データ連動は未実装
 ```
 
 ---
@@ -365,25 +367,25 @@ ReceptionSchedule (s46Wt) — ボトムシート
 
 ---
 
-### M3: 支払い見込み
+### M3: 費用見積もり
 
 ```
 PaymentModal (3g7NX) — ボトムシート
 └── ModalSheet
     ├── handleBar
-    ├── modalHeader: "支払い見込み" + [✕]
+    ├── modalHeader: "費用見積もり" + [✕]
     └── modalContent
         ├── totalCard (bg: #E8F4FA)
-        │   ├── "合計見込み金額"
+        │   ├── "合計見積もり金額"
         │   ├── "¥62,960" [大きく表示]
-        │   └── "シリアル購入費 + 支払い見込み"
+        │   └── "確定分 + 見込み分"
         ├── serialSection: "購入シリアル数" / [-] 22 [+] ステッパー
         │   └── "単価 ¥2,000 / 枚"
         └── breakdownSection: "内訳"
             ├── シリアル購入費: 購入シリアル数 × ¥2,000
-            ├── 当選分 支払い見込み: 通常盤当選枚数 × ¥1,200
-            ├── 支払済: -(既に支払い確定した金額) (緑色)
-            └── 合計見込み: シリアル購入費 + 当選分支払い見込み - 支払済
+            ├── 当選確定分: 通常盤当選枚数 × ¥1,200 (加算)
+            ├── 見込み分: 申込中枚数 × unit_price × 予想当選割合
+            └── 合計見積もり: シリアル購入費 + 当選確定分 + 見込み分
             ※ pen 図のサンプル値 (¥62,960 等) は計算が合わないダミーデータ
 ```
 
@@ -427,19 +429,25 @@ erDiagram
     reception_rounds ||--o{ round_application_rates : "メンバー別予想当選割合"
     members ||--o{ attendance_records : ""
     event_slots ||--o{ attendance_records : ""
+    reception_rounds ||--o{ registrations : "受付次ごとの登録"
+    registrations ||--o{ registration_items : "登録内の各申込み行"
+    registrations ||--o{ registration_rates : "登録内のメンバー別当選率"
+    event_slots ||--o{ registration_items : ""
+    members ||--o{ registration_items : ""
+    members ||--o{ registration_rates : ""
 
     releases {
         uuid id PK
         text title
-        smallint number
+        int number
         date release_date
         text release_type "single | album"
     }
 
     release_centers {
         uuid release_id PK
-        smallint member_id PK
-        smallint center_order
+        uuid member_id PK
+        int center_order
     }
 
     events {
@@ -454,7 +462,7 @@ erDiagram
     event_days {
         uuid id PK
         uuid event_id FK
-        smallint day_number
+        int day_number
         date date
         text venue "nullable"
     }
@@ -462,26 +470,23 @@ erDiagram
     event_slots {
         uuid id PK
         uuid event_day_id FK
-        smallint slot_number
-        time starts_at
-        time ends_at
+        int slot_number
+        timestamptz starts_at
+        timestamptz ends_at
     }
 
     event_day_members {
         uuid event_day_id PK
-        smallint member_id PK
+        uuid member_id PK
     }
 
     members {
-        smallint id PK
+        uuid id PK
         text name UK
         smallint generation
         date birthday
-        text emoji
-        text color_primary
-        text color_secondary
-        boolean is_active
     }
+    %% v2 で追加予定: emoji, color_primary, color_secondary, is_active
 
     reception_rounds {
         uuid id PK
@@ -500,7 +505,7 @@ erDiagram
 
     user_oshi_members {
         uuid user_id PK
-        smallint member_id PK
+        uuid member_id PK
         smallint display_order
     }
 
@@ -509,7 +514,7 @@ erDiagram
         uuid user_id FK
         uuid reception_round_id FK
         uuid event_slot_id FK
-        smallint member_id FK
+        uuid member_id FK
         smallint applied_count
         smallint won_count "NULL=抽選中 0=全落ち 1+=当選"
     }
@@ -517,7 +522,7 @@ erDiagram
     round_application_rates {
         uuid user_id PK
         uuid reception_round_id PK
-        smallint member_id PK
+        uuid member_id PK
         smallint expected_win_rate "0-100"
     }
 
@@ -525,9 +530,33 @@ erDiagram
         uuid id PK
         uuid user_id FK
         uuid event_slot_id FK
-        smallint member_id FK
+        uuid member_id FK
         text status "attended | cancelled"
         text memo
+    }
+
+    registrations {
+        uuid id PK
+        uuid user_id FK
+        uuid reception_round_id FK
+        timestamptz created_at
+    }
+
+    registration_items {
+        uuid id PK
+        uuid registration_id FK
+        uuid event_slot_id FK
+        uuid member_id FK
+        smallint applied_count
+        timestamptz created_at
+    }
+
+    registration_rates {
+        uuid id PK
+        uuid registration_id FK
+        uuid member_id FK
+        smallint expected_win_rate
+        timestamptz created_at
     }
 ```
 
@@ -556,7 +585,7 @@ erDiagram
 | `user_id` | `uuid` | FK → auth.users, NOT NULL | |
 | `reception_round_id` | `uuid` | FK → reception_rounds, NOT NULL | |
 | `event_slot_id` | `uuid` | FK → event_slots, NOT NULL | **変更: `event_day_id` + `slot_number` → `event_slot_id` に統合** |
-| `member_id` | `smallint` | FK → members, NOT NULL | |
+| `member_id` | `uuid` | FK → members, NOT NULL | |
 | `applied_count` | `smallint` | NOT NULL, CHECK (>= 1) | 申込枚数 |
 | `won_count` | `smallint` | CHECK (>= 0 AND won_count <= applied_count), default NULL | NULL=抽選中, 0=全落ち, 1+=当選 |
 | `created_at` | `timestamptz` | NOT NULL, default now() | |
@@ -577,7 +606,7 @@ erDiagram
 |--------|-----|------|------|
 | `user_id` | `uuid` | FK → auth.users, NOT NULL | |
 | `reception_round_id` | `uuid` | FK → reception_rounds, NOT NULL | |
-| `member_id` | `smallint` | FK → members, NOT NULL | |
+| `member_id` | `uuid` | FK → members, NOT NULL | |
 | `expected_win_rate` | `smallint` | NOT NULL, CHECK (0-100) | 予想当選割合 (%)。H5a でユーザーが手動入力 |
 | `created_at` | `timestamptz` | NOT NULL, default now() | |
 
@@ -592,7 +621,7 @@ erDiagram
 | `id` | `uuid` | PK | |
 | `user_id` | `uuid` | FK → auth.users, NOT NULL | |
 | `event_slot_id` | `uuid` | FK → event_slots, NOT NULL | |
-| `member_id` | `smallint` | FK → members, NOT NULL | |
+| `member_id` | `uuid` | FK → members, NOT NULL | |
 | `status` | `text` | NOT NULL, CHECK | `attended` / `cancelled` |
 | `memo` | `text` | | レポ・振り返りメモ |
 | `created_at` | `timestamptz` | NOT NULL, default now() | |
@@ -607,10 +636,40 @@ erDiagram
 | カラム | 型 | 制約 | 説明 |
 |--------|-----|------|------|
 | `release_id` | `uuid` | FK → releases, NOT NULL | |
-| `member_id` | `smallint` | FK → members, NOT NULL | |
-| `center_order` | `smallint` | NOT NULL, default 1 | ダブルセンターの場合 1, 2 |
+| `member_id` | `uuid` | FK → members, NOT NULL | |
+| `center_order` | `int` | NOT NULL, default 1 | ダブルセンターの場合 1, 2 |
 
 **PK**: (`release_id`, `member_id`)
+
+#### `registrations` — 申込み登録 (新規)
+
+| カラム | 型 | 制約 | 説明 |
+|--------|-----|------|------|
+| `id` | `uuid` | PK | |
+| `user_id` | `uuid` | FK → auth.users, NOT NULL | |
+| `reception_round_id` | `uuid` | FK → reception_rounds, NOT NULL | |
+| `created_at` | `timestamptz` | NOT NULL, default now() | |
+
+#### `registration_items` — 申込み行 (新規)
+
+| カラム | 型 | 制約 | 説明 |
+|--------|-----|------|------|
+| `id` | `uuid` | PK | |
+| `registration_id` | `uuid` | FK → registrations, NOT NULL | |
+| `event_slot_id` | `uuid` | FK → event_slots, NOT NULL | |
+| `member_id` | `uuid` | FK → members, NOT NULL | |
+| `applied_count` | `smallint` | NOT NULL, CHECK (>= 1) | 申込枚数 |
+| `created_at` | `timestamptz` | NOT NULL, default now() | |
+
+#### `registration_rates` — 登録時の予想当選割合スナップショット (新規)
+
+| カラム | 型 | 制約 | 説明 |
+|--------|-----|------|------|
+| `id` | `uuid` | PK | |
+| `registration_id` | `uuid` | FK → registrations, NOT NULL | |
+| `member_id` | `uuid` | FK → members, NOT NULL | |
+| `expected_win_rate` | `smallint` | NOT NULL, CHECK (0-100) | 予想当選割合 (%) |
+| `created_at` | `timestamptz` | NOT NULL, default now() | |
 
 ### 4.3 集計ビュー
 
@@ -673,9 +732,10 @@ GROUP BY ra.user_id, e.release_id;
 
 #### `v_slot_popularity` — 人気度判定用 (内部集計ロジック)
 
-※ 以下の SQL は集計ロジックの定義。クライアントへの公開は `SECURITY DEFINER` Postgres function (RPC) またはマテリアライズドビュー経由で行う (セクション 4.4 参照)。
+※ 実装は RPC 関数 `get_slot_popularity(p_event_id uuid, p_member_id uuid)` として `SECURITY DEFINER` で公開。以下の SQL は参考: 内部ロジック。
 
 ```sql
+-- 参考: 内部ロジック (実際は RPC 関数 get_slot_popularity として実装)
 CREATE VIEW v_slot_popularity AS
 SELECT
   ps.event_slot_id,
@@ -714,6 +774,11 @@ GROUP BY ps.event_slot_id, ps.event_day_id, ps.slot_number, ps.member_id;
 | `round_applications` | 本人のみ | 本人のみ | 本人のみ | 本人のみ |
 | `round_application_rates` | 本人のみ | 本人のみ | 本人のみ | 本人のみ |
 | `attendance_records` | 本人のみ | 本人のみ | 本人のみ | 本人のみ |
+| `registrations` | 本人のみ | 本人のみ | 本人のみ | 本人のみ |
+| `registration_items` | 本人のみ (※) | 本人のみ (※) | 本人のみ (※) | 本人のみ (※) |
+| `registration_rates` | 本人のみ (※) | 本人のみ (※) | 本人のみ (※) | 本人のみ (※) |
+
+※ `registration_items` / `registration_rates` の RLS は `registrations.user_id` 経由で本人判定する。
 
 **ビューの RLS 境界と実装方式**:
 - `v_participation_status`: **本人のみ** — `security_invoker` ビュー。下位テーブル `round_applications` の RLS (`auth.uid() = user_id`) がそのまま適用される
@@ -746,10 +811,10 @@ GROUP BY ps.event_slot_id, ps.event_day_id, ps.slot_number, ps.member_id;
 
 | 表示項目 | データソース |
 |---------|------------|
-| メンバー一覧 | `user_oshi_members` → `members` + `event_day_members` (出演確認) |
+| メンバー一覧 | `members` (全メンバー一覧) + `event_day_members` (出演確認) |
 | 日程・部一覧 | `event_days` + `event_slots` |
 | 人気度バッジ | `v_slot_popularity` |
-| 受付次セレクター | `reception_rounds` WHERE `event_id` = 選択中イベント。全受付次を選択可能 (未来も含む)。デフォルト: 現在受付中 (`start_at <= now() < end_at`) があればそれ、なければ次の未来の受付次。選択した受付次で `reception_round_targets` に含まれない日程はグレーアウト。**H4b の場合**: 初回限定盤は `limited_online` と `real` の 2 つの event を持つ。受付次は `events.cd_type = 'limited'` で束ねて共通の `reception_rounds` を表示する |
+| 受付次セレクター | `reception_rounds` WHERE `event_id` = 選択中イベント。全受付次を選択可能 (未来も含む)。デフォルト: 現在受付中 (`start_at <= now() < end_at`) があればそれ、なければ次の未来の受付次。選択した受付次で `reception_round_targets` に含まれない日程はグレーアウト。**H4b の場合**: 初回限定盤は `limited_online` と `real` の 2 つの event を持つ。受付次は `events.cd_type = 'limited'` で束ねて共通の `reception_rounds` を表示する。**v1: 1〜6次の固定選択肢。`reception_rounds` との動的連動は未実装** |
 | 使用シリアルコード数 (H4b) | `round_applications` JOIN `reception_rounds` JOIN `events` WHERE `events.cd_type = 'limited'` の `applied_count` 合計 |
 
 ### H5a: 計画の確認 (通常盤)
@@ -801,21 +866,25 @@ GROUP BY ps.event_slot_id, ps.event_day_id, ps.slot_number, ps.member_id;
 | 受付次リスト | `reception_rounds` JOIN `events` WHERE `release_id` = 直近リリース。`events.format` で通常盤/初回限定盤をセクション分け |
 | 受付ステータスバッジ | `start_at / end_at` と現在時刻の比較 |
 
-### M3: 支払い見込み
+### M3: 費用見積もり
 
 | 表示項目 | データソース |
 |---------|------------|
 | 購入シリアル数 | ユーザーがステッパーで入力 (ローカル state、DB 非保存) |
 | シリアル購入費 | 購入シリアル数 × 2,000 (初回限定盤 unit_price) |
-| 当選分 支払い見込み | 通常盤: `v_participation_status` WHERE `status = 'won'` + `attendance_records` LEFT JOIN (`cancelled` 除外、`attended` 含む) の `total_won × 1,200`。初回限定盤: 当選分は購入済みなので 0 |
-| 支払済 | 過去の受付次で当選確定した通常盤分。同様に `attendance_records` LEFT JOIN で `cancelled` を除外 |
-| 合計見込み | シリアル購入費 + 当選分支払い見込み - 支払済 (送料はセクション 6「通常盤の送料の扱い」参照) |
+| 当選確定分 | `registrations` + `registration_items` + `registration_rates` のスナップショットから算出。per-registration の予想当選割合を適用。通常盤: 当選枚数 × unit_price。初回限定盤: 当選分は購入済みなので 0 |
+| 見込み分 | 申込中 (won_count IS NULL) の枠について、`registration_rates.expected_win_rate` を適用して算出 |
+| 合計見積もり | シリアル購入費 + 当選確定分 + 見込み分 (送料はセクション 6「通常盤の送料の扱い」参照) |
+
+v1 実装: round_applications (現在状態) + round_application_rates (最新の予想当選割合) から算出。registrations はスナップショット保持のみに使用。
+
+※ 内訳表示は `registration_breakdown` として登録単位で表示する。
 
 ### M4: メンバーフィルター
 
 | 表示項目 | データソース |
 |---------|------------|
-| メンバーリスト | `user_oshi_members` → `members`。「全員」オプション + 推しメン一覧 |
+| メンバーリスト | `round_applications` から申込み済みメンバーを抽出。「全員」オプション + 申込み済みメンバー一覧 |
 
 ---
 
@@ -882,3 +951,12 @@ M3 のシリアル数ステッパーはローカル state のみで DB に保存
 | 3 | サイン会の扱い | アプリ全体 | 申込み管理はスコープ外。レポのみ対応予定。レポ対応時に `events.format` に `autograph` を追加し、`attendance_records` と紐付ける |
 | 4 | `round_applications` の参照整合性強化 | DB | v1 はアプリ側バリデーションで対応。サーバー側検証は #32 で対応予定 |
 | 5 | 当落結果入力・参加記録入力の画面導線 | アプリ起動時モーダル | Home タブのスコープ外。別途設計 (アプリ起動時に通知/モーダル起点で表示) |
+
+### 7.5 v1 未実装事項
+
+| # | 項目 | 関連 | 説明 |
+|---|------|------|------|
+| 1 | 非出演日・対象外日程のグレーアウト | B1/B2 | `event_day_members` / `reception_round_targets` に基づくグレーアウト表示は未実装 |
+| 2 | 受付次のデフォルト自動選択 | B3 | 受付中/次の受付次の自動選択ロジックは未実装。固定選択肢のみ |
+| 3 | idempotency key | B5 | H5 登録時の二重送信防止用 idempotency key は未実装。UNIQUE 制約のみで対応 |
+| 4 | 使用済みシリアル数の実データ連動 | A20/B6 | H5b の使用済みシリアル数はハードコード 0。実データからの算出は未実装 |

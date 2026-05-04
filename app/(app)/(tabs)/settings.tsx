@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import {
-  ActivityIndicator,
+  ActivityIndicator, // eslint-disable-line no-restricted-imports -- ボタン内インジケータ
   Alert,
   Text,
   TextInput,
@@ -41,8 +41,8 @@ export default function SettingsTab() {
     <View className="flex-1 bg-white px-6 pt-8">
       <Text className="text-lg font-bold mb-4">アカウント</Text>
 
-      <View className="bg-gray-50 rounded-lg p-4 mb-6">
-        <Text className="text-sm text-gray-500">ステータス</Text>
+      <View className="bg-bg rounded-lg p-4 mb-6">
+        <Text className="text-sm text-text-muted">ステータス</Text>
         <Text className="text-base font-medium mt-1">
           {isAnonymous ? '匿名ユーザー' : user?.email ?? '不明'}
         </Text>
@@ -51,11 +51,11 @@ export default function SettingsTab() {
       {isAnonymous && (
         <View className="mb-6">
           <Text className="text-base font-semibold mb-2">メール連携</Text>
-          <Text className="text-sm text-gray-500 mb-3">
+          <Text className="text-sm text-text-muted mb-3">
             メールアドレスを連携すると、データを安全に保存できます
           </Text>
           <TextInput
-            className="border border-gray-300 rounded-lg px-4 py-3 mb-3 text-base"
+            className="border border-border rounded-lg px-4 py-3 mb-3 text-base"
             placeholder="メールアドレス"
             value={email}
             onChangeText={setEmail}
@@ -65,7 +65,7 @@ export default function SettingsTab() {
             editable={!isLoading}
           />
           <TouchableOpacity
-            className="bg-blue-600 rounded-lg py-3"
+            className="bg-primary rounded-lg py-3"
             onPress={() => void handleLinkEmail()}
             disabled={isLoading}
           >

@@ -1,4 +1,4 @@
-.PHONY: setup dev lint typecheck test check db-start db-reset db-migrate eas-update clean
+.PHONY: setup dev lint typecheck test check db-start db-reset db-migrate db-seed-user db-seed-dummy eas-update clean
 
 # mise exec 経由でコマンドを実行し、mise activate なしでも pinned ツールを使えるようにする
 # グローバル設定 (~/.tool-versions, ~/.config/mise/config.toml) を無視し、
@@ -83,6 +83,38 @@ db-reset:
 ## 新しいマイグレーションファイルを作成 (usage: make db-migrate NAME=add_events)
 db-migrate:
 	$(MISE) supabase migration new $(NAME)
+
+EMAIL ?= dev@example.com
+SUPABASE_URL := http://127.0.0.1:54321
+
+## 開発ユーザーを作成しサンプルデータを投入
+db-seed-user:
+	@echo "→ Creating user $(EMAIL) via Auth Admin API..."
+	@SECRET_KEY=$$($(MISE) supabase status -o env 2>/dev/null | grep '^SERVICE_ROLE_KEY=' | sed 's/^SERVICE_ROLE_KEY="//;s/"$$//') && \
+	RESULT=$$(curl -s -X POST "$(SUPABASE_URL)/auth/v1/admin/users" \
+		-H "Authorization: Bearer $$SECRET_KEY" \
+		-H "Content-Type: application/json" \
+		-d "{\"email\":\"$(EMAIL)\",\"email_confirm\":true,\"password\":\"password123\"}") && \
+	echo "$$RESULT" | head -c 200 && echo ""
+	@echo "→ Seeding sample data..."
+	@$(MISE) supabase db query -f supabase/seed-user-data.sql
+	@echo "✅ Done! Login with $(EMAIL) (OTP via http://localhost:54324)"
+
+## ダミーユーザーを作成しサンプル申込データを投入
+db-seed-dummy:
+	@echo "→ Creating dummy users via Auth Admin API..."
+	@SECRET_KEY=$$($(MISE) supabase status -o env 2>/dev/null | grep '^SERVICE_ROLE_KEY=' | sed 's/^SERVICE_ROLE_KEY="//;s/"$$//') && \
+	curl -s -X POST "$(SUPABASE_URL)/auth/v1/admin/users" \
+		-H "Authorization: Bearer $$SECRET_KEY" \
+		-H "Content-Type: application/json" \
+		-d '{"email":"dummy-a@example.com","email_confirm":true,"password":"password123"}' | head -c 100 && echo "" && \
+	curl -s -X POST "$(SUPABASE_URL)/auth/v1/admin/users" \
+		-H "Authorization: Bearer $$SECRET_KEY" \
+		-H "Content-Type: application/json" \
+		-d '{"email":"dummy-b@example.com","email_confirm":true,"password":"password123"}' | head -c 100 && echo ""
+	@echo "→ Seeding dummy user data..."
+	@$(MISE) supabase db query -f supabase/seed-dummy-users.sql
+	@echo "✅ Done! 2 dummy users created with sample application data."
 
 # ============================================================
 # EAS
